@@ -6,13 +6,13 @@ public class Teacher {
 	private String fname;
 	private String lname;
 	private String password;
-	private ArrayList<ProfExam> examList;
+	private ArrayList<String> examIds;
 	private ArrayList<String> customGroups;
 
-	public Teacher(String fname, String lname,String password, ArrayList<ProfExam> examList,ArrayList<String> grps) {
+	public Teacher(String fname, String lname,String password, ArrayList<String> examList,ArrayList<String> grps) {
 		this.setFname(fname);
 		this.setLname(lname);
-		this.examList = examList;
+		this.examIds = examList;
 		this.password = password;
 		this.customGroups = grps;
 	}
@@ -33,12 +33,12 @@ public class Teacher {
 		this.password = password;
 	}
 
-	public ArrayList<ProfExam> getExamList() {
-		return examList;
+	public ArrayList<String> getExamList() {
+		return examIds;
 	}
 
-	public void setExamList(ArrayList<ProfExam> examList) {
-		this.examList = examList;
+	public void setExamList(ArrayList<String > examList) {
+		this.examIds = examList;
 	}
 
 	public Teacher() {

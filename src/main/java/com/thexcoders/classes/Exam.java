@@ -4,6 +4,7 @@ import org.springframework.data.mongodb.core.index.IndexDirection;
 import org.springframework.data.mongodb.core.index.Indexed;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 
 public class Exam {
@@ -13,15 +14,14 @@ public class Exam {
 	private String length;
 	private String questionsId;
 	private ExamParams params;
-	private Class classe;
+	private ArrayList<Class> classe;
 	private ArrayList<ConnectedStudent> connectedStudents;
 	private ArrayList<Remark> remarksList;
 
 
-	public Exam() {
-	}
+	public Exam() {}
 
-	public Exam(String title, String createdBy, Date start, String length, String questionsId, ExamParams params, Class classe, ArrayList<ConnectedStudent> connectedStudents, ArrayList<Remark> remarksList) {
+	public Exam(String title, String createdBy, Date start, String length, String questionsId, ExamParams params, ArrayList<Class> classe, ArrayList<ConnectedStudent> connectedStudents, ArrayList<Remark> remarksList) {
 		this.title = title;
 		this.createdBy = createdBy;
 		this.start = start;
@@ -32,6 +32,18 @@ public class Exam {
 		this.connectedStudents = connectedStudents;
 		this.remarksList = remarksList;
 	}
+	public Exam(String title, String createdBy, Date start, String length, String questionsId, ExamParams params, Class classe, ArrayList<ConnectedStudent> connectedStudents, ArrayList<Remark> remarksList) {
+		this.title = title;
+		this.createdBy = createdBy;
+		this.start = start;
+		this.length = length;
+		this.questionsId = questionsId;
+		this.params = params;
+		this.classe = new ArrayList<>(Collections.singleton(classe));
+		this.connectedStudents = connectedStudents;
+		this.remarksList = remarksList;
+	}
+
 
 	public ArrayList<Remark> getRemarksList() {
 		return remarksList;
@@ -73,11 +85,20 @@ public class Exam {
 		this.params = params;
 	}
 
-	public Class getClasse() {
+	public ArrayList<Class> getClasse() {
 		return classe;
 	}
 
-	public void setClasse(Class classe) {
+	public Class myClasse(String name){
+		for(Class c:this.classe){
+			if(c.getSpecialty().equals(name)){
+				return c;
+			}
+		}
+		return null;
+	}
+
+	public void setClasse(ArrayList<Class> classe) {
 		this.classe = classe;
 	}
 

@@ -136,10 +136,11 @@ public class Controller {
 
 		List<ExamHolder> examHolder2 = new ArrayList<>();
 		Class studentClass = this.studentrepo.findById(id).get().getStudent().getClasse();
+		String spec = studentClass.getSpecialty();
 		for (ExamHolder exam : exams) {
-			if (exam.getExam().getClasse().getYear().equals(studentClass.getYear())
-				&& exam.getExam().getClasse().getSpecialty().equals(studentClass.getSpecialty())) {
-				for (Object str : exam.getExam().getClasse().getGroups().toArray()) {
+			if (exam.getExam().myClasse(spec).getYear().equals(studentClass.getYear())
+				&& exam.getExam().myClasse(spec).getSpecialty().equals(studentClass.getSpecialty())) {
+				for (Object str : exam.getExam().myClasse(spec).getGroups().toArray()) {
 					if (studentClass.getGroups().contains((String) str)) {
 						examHolder2.add(exam);
 					}
@@ -169,10 +170,11 @@ public class Controller {
 		exams.removeIf(exam -> exam.getExam().getStart().compareTo(new Date()) < 0);
 		JSONArray js = new JSONArray();
 		Class studentClass = this.studentrepo.findById(id).get().getStudent().getClasse();
+		String spec = studentClass.getSpecialty();
 		for (ExamHolder exam : exams) {
-			if (exam.getExam().getClasse().getYear().equals(studentClass.getYear())
-				&& exam.getExam().getClasse().getSpecialty().equals(studentClass.getSpecialty())) {
-				for (Object str : exam.getExam().getClasse().getGroups().toArray()) {
+			if (exam.getExam().myClasse(spec).getYear().equals(studentClass.getYear())
+				&& exam.getExam().myClasse(spec).getSpecialty().equals(studentClass.getSpecialty())) {
+				for (Object str : exam.getExam().myClasse(spec).getGroups().toArray()) {
 					if (studentClass.getGroups().contains((String) str)) {
 						js.put(new JSONObject(new HomeExam(exam).toString()));
 						i++;
@@ -194,10 +196,11 @@ public class Controller {
 		ArrayList<ExamHolder> exams = (ArrayList<ExamHolder>) this.getAllExams();
 		JSONArray js = new JSONArray();
 		Class studentClass = this.studentrepo.findById(id).get().getStudent().getClasse();
+		String spec = studentClass.getSpecialty();
 		for (ExamHolder exam : exams) {
-			if (exam.getExam().getClasse().getYear().equals(studentClass.getYear())
-				&& exam.getExam().getClasse().getSpecialty().equals(studentClass.getSpecialty())) {
-				for (Object str : exam.getExam().getClasse().getGroups().toArray()) {
+			if (exam.getExam().myClasse(spec).getYear().equals(studentClass.getYear())
+				&& exam.getExam().myClasse(spec).getSpecialty().equals(studentClass.getSpecialty())) {
+				for (Object str : exam.getExam().myClasse(spec).getGroups().toArray()) {
 					if (studentClass.getGroups().contains((String) str)) {
 						js.put(new JSONObject(new HomeExam(exam).toString()));
 					}

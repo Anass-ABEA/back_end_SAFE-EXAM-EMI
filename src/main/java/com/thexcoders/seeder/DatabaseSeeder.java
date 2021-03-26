@@ -3,9 +3,11 @@ package com.thexcoders.seeder;
 import com.thexcoders.classes.*;
 import com.thexcoders.classes.Class;
 import com.thexcoders.holders.ExamHolder;
+import com.thexcoders.holders.QuestionHolder;
 import com.thexcoders.holders.StudentHolder;
 import com.thexcoders.holders.TeacherHolder;
 import com.thexcoders.repositories.ExamRepository;
+import com.thexcoders.repositories.QuestionRepository;
 import com.thexcoders.repositories.StudentRepository;
 import com.thexcoders.repositories.TeacherRepo;
 import org.springframework.boot.CommandLineRunner;
@@ -18,11 +20,13 @@ public class DatabaseSeeder implements CommandLineRunner {
 	private final ExamRepository examrepo;
 	private final StudentRepository studentRepository;
 	private final TeacherRepo teacherRepo;
+	private final QuestionRepository questionRepo;
 
-	public DatabaseSeeder(StudentRepository studentRepository, ExamRepository examrepo, TeacherRepo teacherRepo) {
+	public DatabaseSeeder(StudentRepository studentRepository, ExamRepository examrepo, TeacherRepo teacherRepo, QuestionRepository questionRepo) {
 		this.studentRepository = studentRepository;
 		this.examrepo = examrepo;
 		this.teacherRepo = teacherRepo;
+		this.questionRepo = questionRepo;
 	}
 
 	@Override
@@ -108,5 +112,17 @@ public class DatabaseSeeder implements CommandLineRunner {
 		teacherRepo.save(new TeacherHolder("johndoe", t));
 		t = new Teacher("james", "DOE","cb08ca4a7bb5f9683c19133a84872ca7", new ArrayList<>(),new ArrayList<>());
 		teacherRepo.save(new TeacherHolder("jamesdoe", t));
+
+		this.questionRepo.deleteAll();
+		Answers answers = new ShortAnswer("");
+		Questions q = new Questions("Que signifie HTML?","short",2,answers);
+		this.questionRepo.save(new QuestionHolder("a5dbba95394b3020022c7b5a26a3f705",new ArrayList<>(Arrays.asList(q))));
+		answers = new SingleCheckAnswers(new ArrayList<MultiElement>(
+			Arrays.asList(
+				new MultiElement("Système d'emission",false),
+				new MultiElement("Système d'exploitation",true))));
+		Questions q1 = new Questions("Que signifie SE?","single",2,answers);
+
+		this.questionRepo.save(new QuestionHolder("a5dbba953b4b3020022c7b5a26a3f705",new ArrayList<>(Arrays.asList(q,q1))));
 	}
 }

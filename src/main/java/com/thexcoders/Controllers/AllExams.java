@@ -3,6 +3,7 @@ package com.thexcoders.Controllers;
 import com.thexcoders.classes.*;
 import com.thexcoders.classes.Class;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 public class AllExams {
@@ -11,7 +12,7 @@ public class AllExams {
 	private String email;
 	private String length;
 	private String start;
-	private Class classe;
+	private ArrayList<Class> classe;
 	private boolean isPassed;
 	private String proFname;
 	private String proLname;
@@ -100,11 +101,11 @@ public class AllExams {
 		this.start = start;
 	}
 
-	public Class getClasse() {
+	public ArrayList<Class> getClasse() {
 		return classe;
 	}
 
-	public void setClasse(Class classe) {
+	public void setClasse(ArrayList<Class> classe) {
 		this.classe = classe;
 	}
 
