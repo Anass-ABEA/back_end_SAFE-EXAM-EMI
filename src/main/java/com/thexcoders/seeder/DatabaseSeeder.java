@@ -1,0 +1,112 @@
+package com.thexcoders.seeder;
+
+import com.thexcoders.classes.*;
+import com.thexcoders.classes.Class;
+import com.thexcoders.holders.ExamHolder;
+import com.thexcoders.holders.StudentHolder;
+import com.thexcoders.holders.TeacherHolder;
+import com.thexcoders.repositories.ExamRepository;
+import com.thexcoders.repositories.StudentRepository;
+import com.thexcoders.repositories.TeacherRepo;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
+
+import java.util.*;
+
+@Component
+public class DatabaseSeeder implements CommandLineRunner {
+	private final ExamRepository examrepo;
+	private final StudentRepository studentRepository;
+	private final TeacherRepo teacherRepo;
+
+	public DatabaseSeeder(StudentRepository studentRepository, ExamRepository examrepo, TeacherRepo teacherRepo) {
+		this.studentRepository = studentRepository;
+		this.examrepo = examrepo;
+		this.teacherRepo = teacherRepo;
+	}
+
+	@Override
+	public void run(String... args) {
+
+		//70647bb1b46cf31e5d439e10b6759aze
+		//70647bb1b46cf31e5d439e10b675e9ac
+
+		ArrayList<StudentExams> list = new ArrayList<>();
+		list.add(new StudentExams("id1", "today", "now", 0));
+		HashSet<String> set = new HashSet<>();
+		set.add("A");
+		set.add("jdoe_ratt_SE");
+		Class classe = new Class("2020", "INF", set);
+		Student student = new Student("Anass", "AIT BEN EL ARBI", "cb08ca4a7bb5f9683c19133a84872ca7", classe
+			, new ArrayList<>(
+			Arrays.asList(
+				new StudentExams("70647bb1b46cf31e5d439e10b6759aze", new Date().toString(), new Date().toString(), StudentExams.IN_PROGRESS),
+				new StudentExams("70647bb1b46cf31e5d439e10b675e9ac", new Date().toString(), new Date().toString(), StudentExams.MISSED)
+			)
+		));
+		this.studentRepository.deleteAll();
+		this.examrepo.deleteAll();
+		this.studentRepository.save(new StudentHolder("anassaitbenelarbi", student));
+		HashSet sett = new HashSet();
+		sett.add("A");
+
+
+		Date d = new Date();
+		Calendar c = Calendar.getInstance();
+		c.setTime(d);
+		c.add(Calendar.DAY_OF_MONTH, -1);
+		d = c.getTime();
+		this.examrepo.save(new ExamHolder("70647bb1b46cf31e5d439e10b675e9ac",
+			new Exam("JEE", "johndoe", d, "01:00", "a5dbba953b4b3020022c7b5a26a3f705"
+				, new ExamParams(20, 48, 30, true, true, true, true),
+				new Class("2020", "INF", sett), new ArrayList<>(), new ArrayList<>()
+			)));
+
+
+		d = new Date();
+		c = Calendar.getInstance();
+		c.setTime(d);
+		c.add(Calendar.DAY_OF_MONTH, 1);
+		d = c.getTime();
+		this.examrepo.save(new ExamHolder("70647bb1b46cf31e5d439e10b675e9ad",
+			new Exam("Cyber Sec", "johndoe3", d, "01:00", "a5dbba953b4b3020022c7b5a26a3f705"
+				, new ExamParams(20, 48, 30, true, true, true, true),
+				new Class("2020", "INF", sett), new ArrayList<>(), new ArrayList<>()
+			)));
+
+		c = Calendar.getInstance();
+		c.setTime(d);
+		c.add(Calendar.DAY_OF_MONTH, 1);
+		d = c.getTime();
+
+		sett = new HashSet();
+		sett.add("B");
+
+		this.examrepo.save(new ExamHolder("70647bb1b46cf31e5d439e10b675e9af",
+			new Exam("IoT", "johndoe3", d, "01:00", "a5dbba953b4b3020022c7b5a26a3f705"
+				, new ExamParams(20, 48, 30, true, true, true, true),
+				new Class("2020", "INF", sett), new ArrayList<>(), new ArrayList<>()
+			)));
+
+
+		c = Calendar.getInstance();
+		c.setTime(d);
+		c.add(Calendar.DAY_OF_MONTH, 1);
+		d = c.getTime();
+		sett = new HashSet();
+		sett.add("A");
+
+
+		this.examrepo.save(new ExamHolder("70647bb1b46cf31e5d439e10b6759aze",
+			new Exam("Gestion de Projet", "johndoe", d, "01:00", "a5dbba953b4b3020022c7b5a26a3f705"
+				, new ExamParams(20, 48, 30, true, true, true, true),
+				new Class("2020", "INF", sett), new ArrayList<>(), new ArrayList<>()
+			)));
+
+		this.teacherRepo.deleteAll();
+		Teacher t = new Teacher("john", "DOE","cb08ca4a7bb5f9683c19133a84872ca7", new ArrayList<>(),new ArrayList<>());
+		teacherRepo.save(new TeacherHolder("johndoe", t));
+		t = new Teacher("james", "DOE","cb08ca4a7bb5f9683c19133a84872ca7", new ArrayList<>(),new ArrayList<>());
+		teacherRepo.save(new TeacherHolder("jamesdoe", t));
+	}
+}
