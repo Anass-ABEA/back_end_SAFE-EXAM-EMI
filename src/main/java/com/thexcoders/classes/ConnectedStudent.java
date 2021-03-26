@@ -1,19 +1,33 @@
 package com.thexcoders.classes;
 
+import java.util.ArrayList;
+
 public class ConnectedStudent {
 	private String id;
 	private String questionNumber;
 	private String QuestionAnswered;
 	private String currentMark;
+	private ArrayList<Integer> previousQuestions;
 
 	public ConnectedStudent() {
 	}
 
-	public ConnectedStudent(String id, String questionNumber, String questionAnswered, String currentMark) {
+
+
+	public ConnectedStudent(String id, String questionNumber, String questionAnswered, String currentMark, ArrayList<Integer> previousQuestions) {
 		this.id = id;
 		this.questionNumber = questionNumber;
 		QuestionAnswered = questionAnswered;
 		this.currentMark = currentMark;
+		this.previousQuestions = previousQuestions;
+	}
+
+	public ArrayList<Integer> getPreviousQuestions() {
+		return previousQuestions;
+	}
+
+	public void setPreviousQuestions(ArrayList<Integer> previousQuestions) {
+		this.previousQuestions = previousQuestions;
 	}
 
 	public String getId() {
