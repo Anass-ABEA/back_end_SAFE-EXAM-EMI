@@ -10,6 +10,7 @@ public class HomeExam {
 	private Length length;
 	private Length startTime;
 	private Date date;
+	private boolean isStarted;
 
 	public HomeExam(ExamHolder exam) {
 		this.professor = exam.getExam().getCreatedBy();
@@ -17,6 +18,7 @@ public class HomeExam {
 		this.setLength(exam.getExam().getLength());
 		this.setStartTIme(exam.getExam().getStart());
 		this.title = exam.getExam().getTitle();
+		this.isStarted = exam.isStarted();
 	}
 
 	public String getId() {
@@ -76,6 +78,7 @@ public class HomeExam {
 			", length:" + length +
 			", startTime:" + startTime +
 			", date:" + date +
+			", isStarted:" + isStarted +
 			'}';
 	}
 
@@ -94,8 +97,8 @@ public class HomeExam {
 
 	private void setLength(String length) {
 		this.length = new Length();
-		this.length.h = Integer.parseInt(length.split(":")[0]);
-		this.length.m = Integer.parseInt(length.split(":")[1]);
+		this.length.h = Integer.parseInt(length.split("h")[0]);
+		this.length.m = Integer.parseInt(length.split("h")[1]);
 	}
 
 

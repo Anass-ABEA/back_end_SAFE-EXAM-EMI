@@ -1,34 +1,21 @@
 package com.thexcoders.classes;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 public class ConnectedStudent {
 	private String id;
-	private String questionNumber;
-	private String QuestionAnswered;
-	private String currentMark;
-	private ArrayList<Integer> previousQuestions;
+	private Date startDate,endDate;
+	ArrayList<StuRep> reponses;
 
-	public ConnectedStudent() {
-	}
-
-
-
-	public ConnectedStudent(String id, String questionNumber, String questionAnswered, String currentMark, ArrayList<Integer> previousQuestions) {
+	public ConnectedStudent(String id, Date startDate, Date endDate, ArrayList<StuRep> reponses) {
 		this.id = id;
-		this.questionNumber = questionNumber;
-		QuestionAnswered = questionAnswered;
-		this.currentMark = currentMark;
-		this.previousQuestions = previousQuestions;
+		this.startDate = startDate;
+		this.endDate = endDate;
+		this.reponses = reponses;
 	}
 
-	public ArrayList<Integer> getPreviousQuestions() {
-		return previousQuestions;
-	}
-
-	public void setPreviousQuestions(ArrayList<Integer> previousQuestions) {
-		this.previousQuestions = previousQuestions;
-	}
+	public ConnectedStudent() {}
 
 	public String getId() {
 		return id;
@@ -38,27 +25,27 @@ public class ConnectedStudent {
 		this.id = id;
 	}
 
-	public String getQuestionNumber() {
-		return questionNumber;
+	public Date getStartDate() {
+		return startDate;
 	}
 
-	public void setQuestionNumber(String questionNumber) {
-		this.questionNumber = questionNumber;
+	public void setStartDate(Date startDate) {
+		this.startDate = startDate;
 	}
 
-	public String getQuestionAnswered() {
-		return QuestionAnswered;
+	public Date getEndDate() {
+		return endDate;
 	}
 
-	public void setQuestionAnswered(String questionAnswered) {
-		QuestionAnswered = questionAnswered;
+	public void setEndDate(Date endDate) {
+		this.endDate = endDate;
 	}
 
-	public String getCurrentMark() {
-		return currentMark;
+	public ArrayList<StuRep> getReponses() {
+		return reponses;
 	}
 
-	public void setCurrentMark(String currentMark) {
-		this.currentMark = currentMark;
+	public void setReponses(ArrayList<StuRep> reponses) {
+		this.reponses = reponses;
 	}
 }

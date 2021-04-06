@@ -1,4 +1,7 @@
-package com.thexcoders.classes;
+package com.thexcoders.examClasses;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class MultiElement {
 		String body;
@@ -23,5 +26,12 @@ public class MultiElement {
 
 	public void setCorrect(boolean correct) {
 		isCorrect = correct;
+	}
+
+	public JSONObject toJSONObject() throws JSONException {
+		JSONObject res = new JSONObject();
+		res.put("val",body);
+		res.put("isCorrect",isCorrect);
+		return res;
 	}
 }

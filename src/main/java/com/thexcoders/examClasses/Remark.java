@@ -1,4 +1,4 @@
-package com.thexcoders.classes;
+package com.thexcoders.examClasses;
 
 public class Remark {
 	private String studentId;
@@ -27,4 +27,6 @@ public class Remark {
 	public void setBody(String body) {
 		this.body = body;
 	}
+
+
 }

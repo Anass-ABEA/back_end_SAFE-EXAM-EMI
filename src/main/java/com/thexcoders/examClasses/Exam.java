@@ -1,7 +1,7 @@
-package com.thexcoders.classes;
+package com.thexcoders.examClasses;
 
-import org.springframework.data.mongodb.core.index.IndexDirection;
-import org.springframework.data.mongodb.core.index.Indexed;
+import com.thexcoders.classes.Class;
+import com.thexcoders.classes.ConnectedStudent;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -126,4 +126,33 @@ public class Exam {
 	public void setLength(String length) {
 		this.length = length;
 	}
+
+	public boolean hasElement(String body){
+		for(Remark r :this.remarksList){
+			if(r.getBody().equals(body)){
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public void addConnected(ConnectedStudent connectedStudent) {
+		this.connectedStudents.removeIf(stu -> stu.getId().equals(connectedStudent.getId()));
+		this.connectedStudents.add(connectedStudent);
+	}
+
+/*	@Override
+	public String toString() {
+		return "{" +
+			"title:'" + title + '\'' +
+			", createdBy:'" + createdBy + '\'' +
+			", start:'" + start +
+			"', length:'" + length + '\'' +
+			", questionsId:'" + questionsId + '\'' +
+			", params:" + params +
+			", classe:" + classe +
+			", connectedStudents:" + connectedStudents +
+			", remarksList:" + remarksList +
+			'}';
+	}*/
 }

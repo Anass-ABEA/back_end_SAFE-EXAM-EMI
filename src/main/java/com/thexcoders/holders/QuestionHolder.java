@@ -1,6 +1,7 @@
 package com.thexcoders.holders;
 
-import com.thexcoders.classes.Questions;
+import com.thexcoders.examClasses.Questions;
+import org.json.JSONArray;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -12,12 +13,25 @@ public class QuestionHolder {
 	private String id;
 	private ArrayList<Questions> questions;
 
+
 	public QuestionHolder(String id, ArrayList<Questions> questions) {
 		this.id = id;
 		this.questions = questions;
 	}
 
 	public QuestionHolder() {
+	}
+
+	public QuestionHolder(String id,JSONArray questions) {
+		this.id = id;
+		this.questions = new ArrayList<>();
+		for (int i = 0; i<questions.length();i++){
+			try{
+				this.questions.add(new Questions(questions.getJSONObject(i)));
+			}catch (Exception e){
+				e.printStackTrace();
+			}
+		}
 	}
 
 	public String getId() {

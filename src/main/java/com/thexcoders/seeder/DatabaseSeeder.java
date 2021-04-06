@@ -2,6 +2,7 @@ package com.thexcoders.seeder;
 
 import com.thexcoders.classes.*;
 import com.thexcoders.classes.Class;
+import com.thexcoders.examClasses.*;
 import com.thexcoders.holders.ExamHolder;
 import com.thexcoders.holders.QuestionHolder;
 import com.thexcoders.holders.StudentHolder;
@@ -44,8 +45,7 @@ public class DatabaseSeeder implements CommandLineRunner {
 		Student student = new Student("Anass", "AIT BEN EL ARBI", "cb08ca4a7bb5f9683c19133a84872ca7", classe
 			, new ArrayList<>(
 			Arrays.asList(
-				new StudentExams("70647bb1b46cf31e5d439e10b6759aze", new Date().toString(), new Date().toString(), StudentExams.IN_PROGRESS),
-				new StudentExams("70647bb1b46cf31e5d439e10b675e9ac", new Date().toString(), new Date().toString(), StudentExams.MISSED)
+				new StudentExams("70647bb1b46cf31e5d439e10b675e9ac", new Date().toString(), new Date().toString(), StudentExams.FINISHED)
 			)
 		));
 		this.studentRepository.deleteAll();
@@ -55,29 +55,30 @@ public class DatabaseSeeder implements CommandLineRunner {
 		sett.add("A");
 
 
-		Date d = new Date();
+		Date d = new Date("03/28/2021 08:00");
 		Calendar c = Calendar.getInstance();
 		c.setTime(d);
 		c.add(Calendar.DAY_OF_MONTH, -1);
 		d = c.getTime();
 		this.examrepo.save(new ExamHolder("70647bb1b46cf31e5d439e10b675e9ac",
-			new Exam("JEE", "johndoe", d, "01:00", "a5dbba953b4b3020022c7b5a26a3f705"
+			new Exam("JEE", "johndoe", d, "01h00", "a5dbba953b4b3020022c7b5a26a3f705"
 				, new ExamParams(20, 48, 30, true, true, true, true),
 				new Class("2020", "INF", sett), new ArrayList<>(), new ArrayList<>()
-			)));
+			),true));
 
-
-		d = new Date();
+		d = new Date("04/05/2021 10:00");
 		c = Calendar.getInstance();
 		c.setTime(d);
 		c.add(Calendar.DAY_OF_MONTH, 1);
 		d = c.getTime();
+
 		this.examrepo.save(new ExamHolder("70647bb1b46cf31e5d439e10b675e9ad",
-			new Exam("Cyber Sec", "johndoe3", d, "01:00", "a5dbba953b4b3020022c7b5a26a3f705"
+			new Exam("Cyber Sec", "johndoe3", d, "01h00", "a5dbba953b4b3020022c7b5a26a3f705"
 				, new ExamParams(20, 48, 30, true, true, true, true),
 				new Class("2020", "INF", sett), new ArrayList<>(), new ArrayList<>()
-			)));
+			),false));
 
+		d = new Date("04/06/2021 16:00");
 		c = Calendar.getInstance();
 		c.setTime(d);
 		c.add(Calendar.DAY_OF_MONTH, 1);
@@ -87,12 +88,12 @@ public class DatabaseSeeder implements CommandLineRunner {
 		sett.add("B");
 
 		this.examrepo.save(new ExamHolder("70647bb1b46cf31e5d439e10b675e9af",
-			new Exam("IoT", "johndoe3", d, "01:00", "a5dbba953b4b3020022c7b5a26a3f705"
+			new Exam("IoT", "johndoe3", d, "01h00", "a5dbba953b4b3020022c7b5a26a3f705"
 				, new ExamParams(20, 48, 30, true, true, true, true),
 				new Class("2020", "INF", sett), new ArrayList<>(), new ArrayList<>()
-			)));
+			),true));
 
-
+		d = new Date("03/31/2021 14:00");
 		c = Calendar.getInstance();
 		c.setTime(d);
 		c.add(Calendar.DAY_OF_MONTH, 1);
@@ -102,27 +103,26 @@ public class DatabaseSeeder implements CommandLineRunner {
 
 
 		this.examrepo.save(new ExamHolder("70647bb1b46cf31e5d439e10b6759aze",
-			new Exam("Gestion de Projet", "johndoe", d, "01:00", "a5dbba953b4b3020022c7b5a26a3f705"
+			new Exam("Gestion de Projet", "johndoe", d, "01h00", "a5dbba953b4b3020022c7b5a26a3f705"
 				, new ExamParams(20, 48, 30, true, true, true, true),
 				new Class("2020", "INF", sett), new ArrayList<>(), new ArrayList<>()
-			)));
+			),true));
 
 		this.teacherRepo.deleteAll();
-		Teacher t = new Teacher("john", "DOE","cb08ca4a7bb5f9683c19133a84872ca7", new ArrayList<>(),new ArrayList<>());
+		Teacher t = new Teacher("john", "DOE","cb08ca4a7bb5f9683c19133a84872ca7", new ArrayList<>(Arrays.asList("70647bb1b46cf31e5d439e10b6759aze","70647bb1b46cf31e5d439e10b675e9af")),new ArrayList<>());
 		teacherRepo.save(new TeacherHolder("johndoe", t));
 		t = new Teacher("james", "DOE","cb08ca4a7bb5f9683c19133a84872ca7", new ArrayList<>(),new ArrayList<>());
 		teacherRepo.save(new TeacherHolder("jamesdoe", t));
 
 		this.questionRepo.deleteAll();
-		Answers answers = new ShortAnswer("");
-		Questions q = new Questions("Que signifie HTML?","short",2,answers);
-		this.questionRepo.save(new QuestionHolder("a5dbba95394b3020022c7b5a26a3f705",new ArrayList<>(Arrays.asList(q))));
-		answers = new SingleCheckAnswers(new ArrayList<MultiElement>(
+		Questions q = new Questions("Que signifie HTML?","short",2,null);
+		this.questionRepo.save(new QuestionHolder("a5dbba953b4b3020022c7qsd26a3f705",new ArrayList<>(Arrays.asList(q))));
+		Answers answers = new SingleCheckAnswers(new ArrayList<MultiElement>(
 			Arrays.asList(
 				new MultiElement("Système d'emission",false),
 				new MultiElement("Système d'exploitation",true))));
 		Questions q1 = new Questions("Que signifie SE?","single",2,answers);
 
-		this.questionRepo.save(new QuestionHolder("a5dbba953b4b3020022c7b5a26a3f705",new ArrayList<>(Arrays.asList(q,q1))));
+		this.questionRepo.save(new QuestionHolder("70647bb1b46cf31e5d439e10b6759aze",new ArrayList<>(Arrays.asList(q,q1))));
 	}
 }

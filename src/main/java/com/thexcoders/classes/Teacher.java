@@ -9,7 +9,7 @@ public class Teacher {
 	private ArrayList<String> examIds;
 	private ArrayList<String> customGroups;
 
-	public Teacher(String fname, String lname,String password, ArrayList<String> examList,ArrayList<String> grps) {
+	public Teacher(String fname, String lname, String password, ArrayList<String> examList, ArrayList<String> grps) {
 		this.setFname(fname);
 		this.setLname(lname);
 		this.examIds = examList;
@@ -37,7 +37,7 @@ public class Teacher {
 		return examIds;
 	}
 
-	public void setExamList(ArrayList<String > examList) {
+	public void setExamList(ArrayList<String> examList) {
 		this.examIds = examList;
 	}
 
@@ -49,7 +49,7 @@ public class Teacher {
 	}
 
 	public void setFname(String fname) {
-		this.fname = fname.substring(0,1).toUpperCase()+fname.substring(1).toLowerCase();
+		this.fname = fname.substring(0, 1).toUpperCase() + fname.substring(1).toLowerCase();
 	}
 
 	public String getLname() {
@@ -61,6 +61,18 @@ public class Teacher {
 	}
 
 	public String[] profInfo() {
-		return new String[]{this.fname,this.lname};
+		return new String[]{this.fname, this.lname};
+	}
+
+	public boolean addExam(String id) {
+		if(this.examIds.contains(id)){
+			return false;
+		}
+		this.examIds.add(id);
+		return true;
+	}
+
+	public String profName(){
+		return lname.toUpperCase()+" "+fname.substring(0,1).toUpperCase()+".";
 	}
 }

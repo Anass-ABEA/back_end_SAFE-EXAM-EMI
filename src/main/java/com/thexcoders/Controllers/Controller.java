@@ -1,13 +1,16 @@
 package com.thexcoders.Controllers;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import com.thexcoders.classes.*;
 import com.thexcoders.classes.Class;
+import com.thexcoders.examClasses.*;
 import com.thexcoders.holders.ExamHolder;
+import com.thexcoders.holders.QuestionHolder;
 import com.thexcoders.holders.StudentHolder;
 import com.thexcoders.holders.TeacherHolder;
 import com.thexcoders.repositories.ExamRepository;
+import com.thexcoders.repositories.QuestionRepository;
 import com.thexcoders.repositories.TeacherRepo;
+import com.thexcoders.teacherHelperClasses.HomeTeacherExam;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -15,7 +18,11 @@ import com.thexcoders.repositories.StudentRepository;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
+
+import static com.thexcoders.examClasses.Questions.*;
 
 @RestController
 @CrossOrigin("*")
@@ -23,11 +30,13 @@ public class Controller {
 	private StudentRepository studentrepo;
 	private ExamRepository examRepo;
 	private TeacherRepo teacherRepo;
+	private QuestionRepository questionRepo;
 
-	public Controller(StudentRepository studentrepo, ExamRepository examRepo,TeacherRepo teacherRepo) {
+	public Controller(StudentRepository studentrepo, ExamRepository examRepo, TeacherRepo teacherRepo,QuestionRepository questionRepo) {
 		this.studentrepo = studentrepo;
 		this.examRepo = examRepo;
-		this.teacherRepo=teacherRepo;
+		this.teacherRepo = teacherRepo;
+		this.questionRepo = questionRepo;
 	}
 
 	// getting all students
@@ -35,11 +44,6 @@ public class Controller {
 	public List<StudentHolder> getAllStudents() {
 		return this.studentrepo.findAll();
 	}
-
-	/*TODOS
-	 * redirect to the needed URL
-	 * add dispatchers ( forwarding )
-	 * */
 
 	//adding a new student
 	@PutMapping("/students/add/")
@@ -63,13 +67,13 @@ public class Controller {
 	}
 
 	@PostMapping("/students/update/{studentID}")
-	public boolean update(@PathVariable("studentID") String id,@RequestBody String password) {
+	public boolean update(@PathVariable("studentID") String id, @RequestBody String password) {
 		StudentHolder stud = this.studentrepo.findById(id).get();
-		try{
-			if(password.length()!=32) throw new Exception("PASS INCORRECT");
+		try {
+			if (password.length() != 32) throw new Exception("PASS INCORRECT");
 			stud.getStudent().setPassword(password);
 			this.studentrepo.save(stud);
-		}catch (Exception e){
+		} catch (Exception e) {
 			return false;
 		}
 		return true;
@@ -150,6 +154,18 @@ public class Controller {
 		return examHolder2;
 	}
 
+	//comment exam
+	@PostMapping("/exams/{id}/feedback/{studentID}")
+	public boolean updatecommentaire(@PathVariable("studentID") String idstudent,@PathVariable("id") String idexam,@RequestBody String body){
+		Remark remark = new Remark(idstudent, body);
+		ExamHolder exam = this.examRepo.findById(idexam).get();
+		if(exam==null) return false;
+		if(exam.getExam().hasElement(body)) return false;
+		exam.getExam().getRemarksList().add(remark);
+		this.examRepo.save(exam);
+		return true;
+	}
+
 	// deleting exam by ID ( testing )
 	@DeleteMapping("/exams/{id}")
 	public boolean detelteExamByID(@PathVariable("id") String id) {
@@ -159,6 +175,12 @@ public class Controller {
 			return true;
 		}
 		return false;
+	}
+
+	// gett exam by ID ( testing )
+	@GetMapping("/exams/{id}")
+	public ExamHolder getExamById(@PathVariable("id") String id) {
+		return  this.examRepo.findById(id).get();
 	}
 
 	// getting the 3 incomming exams to display to the student
@@ -172,6 +194,7 @@ public class Controller {
 		Class studentClass = this.studentrepo.findById(id).get().getStudent().getClasse();
 		String spec = studentClass.getSpecialty();
 		for (ExamHolder exam : exams) {
+			if(!exam.isVisible()) continue;
 			if (exam.getExam().myClasse(spec).getYear().equals(studentClass.getYear())
 				&& exam.getExam().myClasse(spec).getSpecialty().equals(studentClass.getSpecialty())) {
 				for (Object str : exam.getExam().myClasse(spec).getGroups().toArray()) {
@@ -189,7 +212,6 @@ public class Controller {
 	}
 
 
-
 	// getting sorted exams for a specific user and sorting them to display on the calendar
 	@GetMapping("/exams/StudentExams/{studentID}")
 	public String getFutureExamsSorted(@PathVariable("studentID") String id) throws JSONException {
@@ -198,6 +220,7 @@ public class Controller {
 		Class studentClass = this.studentrepo.findById(id).get().getStudent().getClasse();
 		String spec = studentClass.getSpecialty();
 		for (ExamHolder exam : exams) {
+			if(!exam.isVisible())continue;
 			if (exam.getExam().myClasse(spec).getYear().equals(studentClass.getYear())
 				&& exam.getExam().myClasse(spec).getSpecialty().equals(studentClass.getSpecialty())) {
 				for (Object str : exam.getExam().myClasse(spec).getGroups().toArray()) {
@@ -210,6 +233,22 @@ public class Controller {
 		return js.toString();
 	}
 
+	@PostMapping("/exams/BeginExam/{examId}")
+	public boolean startExam(@PathVariable("examId") String examId,@RequestBody String visibility){
+		ExamHolder exam = this.examRepo.findById(examId).get();
+		if(exam==null) return false;
+		exam.setStarted(Boolean.parseBoolean(visibility));
+		this.examRepo.save(exam);
+		return true;
+	}
+
+	@GetMapping("/exam/isExamStarted/{examId}")
+	public String isExamStarted(@PathVariable("examId") String examId) throws JSONException {
+		JSONObject res = new JSONObject();
+		res.put("isOpen",this.examRepo.findById(examId).get().isStarted());
+		res.put("isgoodgood",this.examRepo.findById(examId).get().getExam().getParams().isGoodgood());
+		return res.toString();
+	}
 
 	// getting all exams to display on the "Mes Examens" page
 	@GetMapping("/exams/getExams/{studentID}")
@@ -219,45 +258,44 @@ public class Controller {
 
 		JSONArray result = new JSONArray();
 
-		for(StudentExams stdexam : examList){
+		for (StudentExams stdexam : examList) {
 			Exam mExam = this.examRepo.findById(stdexam.getId()).get().getExam();
-
-			try{
+			try {
 				Teacher teacher = this.teacherRepo.findById(mExam.getCreatedBy()).get().getTeacher();
 				String[] profInfo = teacher.profInfo();
-				AllExams obj = new AllExams(stdexam.getId(),mExam,stdexam,profInfo[0],profInfo[1]);
+				AllExams obj = new AllExams(stdexam.getId(), mExam, stdexam, profInfo[0], profInfo[1], student.getClasse());
 				result.put(new JSONObject(obj.toString()));
-			}catch (Exception e){
-				System.err.println("ERROR "+e.getMessage()+"\n in Professor : "+mExam.getCreatedBy());
+			} catch (Exception e) {
+				System.err.println("ERROR " + e.getMessage() + "\n in Professor : " + mExam.getCreatedBy());
 			}
 		}
 
 		return result.toString();
-
-
-
-	/*	//getting student class
-		Class studentClass = this.studentrepo.findById(id).get().getStudent().getClasse();
-
-		//getting all exams
-		ArrayList<ExamHolder> exams = (ArrayList<ExamHolder>) this.getAllExams();
-		JSONArray js = new JSONArray();
-
-		for (ExamHolder exam : exams) {
-			//if exam matches student Classe
-			if (exam.getExam().getClasse().getYear().equals(studentClass.getYear())
-				&& exam.getExam().getClasse().getSpecialty().equals(studentClass.getSpecialty())) {
-				for (Object str : exam.getExam().getClasse().getGroups().toArray()) {
-					// if grp matches student's
-					if (studentClass.getGroups().contains((String) str)) {
-						js.put(new JSONObject(new AllExams(exam).toString()));
-						System.out.println(new JSONObject(new AllExams(exam).toString()));
-					}
-				}
-			}
-		}
-		return js.toString();*/
 	}
+	@GetMapping("/exams/TeacherExams3/{teacherId}")
+	public String getTeacherExamsHome(@PathVariable("teacherId") String teacherId) throws JSONException {
+		Teacher teacher = this.teacherRepo.findById(teacherId).get().getTeacher();
+		ArrayList<String> examIds = teacher.getExamList();
+		List<String> exams = new ArrayList<>();
+		for(String id : examIds){
+			ExamHolder mexam = this.examRepo.findById(id).get();
+			HomeTeacherExam home = new HomeTeacherExam(mexam);
+			JSONObject json = new JSONObject(home.toString());
+			exams.add(json.toString());
+		}
+		//System.out.println(exams.toString());
+		return exams.toString();
+	}
+
+	@PostMapping("/exams/visibility/{examId}")
+	public boolean changeExamVisibility(@PathVariable("examId") String examId,@RequestBody String visibility){
+		ExamHolder exam = this.examRepo.findById(examId).get();
+		if(exam==null)return false;
+		exam.setVisible(Boolean.parseBoolean(visibility));
+		this.examRepo.save(exam);
+		return true;
+	}
+
 	@GetMapping("/teachers/all")
 	public List<TeacherHolder> getAllTeachers() {
 		return this.teacherRepo.findAll();
@@ -272,7 +310,7 @@ public class Controller {
 	@GetMapping("/teachers/connect/{email}/{password}")
 	public Boolean loginteacher(@PathVariable("email") String email, @PathVariable("password") String pass) {
 		TeacherHolder stu = this.teacherRepo.findById(email).get();
-		if(stu == null) return false;
+		if (stu == null) return false;
 		if (stu.getTeacher().getPassword().equals(pass)) {
 			return true;
 		}
@@ -294,18 +332,192 @@ public class Controller {
 		}
 	}
 
-
-	// getting student Data to display on the home page
-	/*@RequestMapping(value = "/teachers/data/{email}", method = RequestMethod.GET,
-		produces = MediaType.APPLICATION_JSON_VALUE)
-	public String dataTeacher(@PathVariable("email") String email) {
-		TeacherHolder stu = this.teacherRepo.findById(email).get();
-		HomeTeacher home = new HomeTeacher(stu.getTeacher());
+	@PostMapping("/newExam/{teacherID}")
+	public String createNewExam(@PathVariable("teacherID") String teacherId,@RequestBody String examData) throws JSONException {
+		JSONObject result = new JSONObject();
 		try {
-			return new JSONObject(home.toString()).toString();
-		} catch (JSONException e) {
+		JSONObject data = new JSONObject(examData);
+		JSONObject length = data.getJSONObject("values").getJSONObject("length");
+		ExamParams params = new ExamParams(data.getJSONObject("booleans"),data.getJSONObject("values").getString("note")
+			,data.getJSONArray("questions").length(),data.getJSONObject("values").getString("display"));
 
-			return "";
+		ArrayList<Class> classes = new ArrayList<>();
+		JSONArray jsonGenies = data.getJSONArray("genies");
+		JSONArray jsonGrps = data.getJSONArray("groups");
+		String promo = data.getJSONObject("values").getString("promo");
+
+		for(int i = 0; i<jsonGenies.length(); i++){
+			String genie = jsonGenies.get(i).toString();
+			HashSet set = new HashSet();
+
+			for(int j = 0; j<jsonGrps.length(); j++){
+				String grp = jsonGrps.get(i).toString();
+				set.add(grp);
+			}
+			classes.add(new Class(promo,genie,set));
 		}
-	}*/
+
+		String examName = data.getJSONObject("values").getString("examName");
+		String d  = data.getJSONObject("values").getString("date");
+		String t = data.getJSONObject("values").getString("time");
+		Date date = new SimpleDateFormat("yyyy-MM-dd hh:mm").parse(d+" "+t);
+		String len = length.getString("h")+"h"+length.getString("m");
+		String id = data.getJSONObject("values").getString("hashed");
+		Exam exam = new Exam(examName,
+			teacherId,date,len
+			,id,params,classes,new ArrayList<ConnectedStudent>(),new ArrayList<Remark>());
+		this.examRepo.save(new ExamHolder(data.getJSONObject("values").getString("hashed"),exam,data.getJSONObject("booleans").getBoolean("isVisible")));
+			QuestionHolder q = new QuestionHolder(data.getJSONObject("values").getString("hashed"),
+				data.getJSONArray("questions"));
+			this.questionRepo.save(q);
+
+		TeacherHolder teacherHolder = this.teacherRepo.findById(teacherId).get();
+		if(!teacherHolder.getTeacher().addExam(id)){
+			result.put("isAdded",false);
+			result.put("Error","Un examen du meme type existe déjà");
+			result.put("ErrType",0);
+			return result.toString();
+		}
+		this.teacherRepo.save(teacherHolder);
+		}catch (Exception e){
+			result.put("isAdded",false);
+			result.put("Error","Une erreure est survenue, merci d'essayer plustards");
+			result.put("ErrType",-1);
+			//ERROR TYPE -1 ERROR IN PARSING
+			//ERROR TYPE 0 ERROR IN ADDING (exsts already)
+			return result.toString();
+		}
+		result.put("isAdded",true);
+		return result.toString();
+	}
+
+	//getting exam's first Data
+	@RequestMapping(value = "/exams/firstData/{examId}", method = RequestMethod.GET,
+		produces = MediaType.APPLICATION_JSON_VALUE)
+	public String getExamDetails(@PathVariable("examId") String examId) throws JSONException {
+		ExamHolder examHolder = this.examRepo.findById(examId).get();
+		Exam exam = examHolder.getExam();
+		JSONObject res = new JSONObject();
+
+		res.put("title",exam.getTitle());
+		res.put("length",exam.getLength());
+		res.put("tries","1");
+		res.put("nbrQuestions",exam.getParams().getDispQuestions());
+		res.put("profName",this.teacherRepo.findById(exam.getCreatedBy()).get().getTeacher().profName());
+		res.put("isFraudOn",exam.getParams().isFraud());
+
+		return res.toString();
+	}
+
+	@PostMapping("/exams/updateresult/{ExamId}")
+	public void postReponse(@RequestBody String connectedStudent, @PathVariable String ExamId) throws JSONException, ParseException {
+		JSONObject data = new JSONObject(connectedStudent);
+		ArrayList<StuRep> reponses = new ArrayList<>();
+		JSONArray table = data.getJSONArray("reponses");
+
+		for(int i = 0; i<table.length();i++){
+			JSONObject json = table.getJSONObject(i);
+			int type = json.getInt("type");
+			switch (type){
+				case StuRep.LONG:
+					reponses.add(new TextRep(json.getString("value"),json.getInt("index"),json.getDouble("note"),json.getDouble("total")));
+					break;
+				case StuRep.MULTIPLE:
+					reponses.add(new MultipleRep(json.getJSONArray("value"),json.getInt("index"),json.getDouble("note"),json.getDouble("total")));
+					break;
+				case StuRep.SHORT:
+					reponses.add(new TextRep(json.getString("value"),json.getInt("index"),json.getDouble("note"),json.getDouble("total")));
+					break;
+				case StuRep.SINGLE:
+					reponses.add(new SingleRep(json.getString("value"),json.getInt("index"),json.getDouble("note"),json.getDouble("total")));
+					break;
+			}
+		}
+		Date start = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse(
+			data.getString("startDate").split("T")[0]+" "+data.getString("startDate").split("T")[1].substring(0,8)
+		);
+		Date end = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse(
+			data.getString("endDate").split("T")[0]+" "+data.getString("endDate").split("T")[1].substring(0,8)
+		);
+		ConnectedStudent coStu = new ConnectedStudent(
+			data.getString("id"),
+			start,
+			end,
+			reponses
+		);
+
+		ExamHolder examHolder = this.examRepo.findById(ExamId).get();
+		Exam exam = examHolder.getExam();
+		exam.addConnected(coStu);
+		this.examRepo.save(examHolder);
+	}
+
+	//getting exam's questions and answers
+	@RequestMapping(value = "/exams/questions/{examId}", method = RequestMethod.GET,
+		produces = MediaType.APPLICATION_JSON_VALUE)
+	public String getExamQuestions(@PathVariable("examId") String examId) throws JSONException {
+		System.err.println(examId);
+		ExamHolder examHolder = this.examRepo.findById(examId).get();
+		Exam exam = examHolder.getExam();
+		JSONArray res = new JSONArray();
+		int index = 0;
+		for(Questions qst : this.questionRepo.findById(examHolder.getId()).get().getQuestions()){
+			JSONObject question = new JSONObject();
+			switch (qst.getType()){
+				case LONG:
+					question = getTxtReply(qst);
+					break;
+				case SHORT:
+					question = getTxtReply(qst);
+					break;
+				case SINGLE:
+					question = getCheckReply(qst);
+					break;
+				case MULTIPLE:
+					question = getCheckReply(qst);
+					break;
+			}
+			question.put("i",index);
+			res.put(question);
+			index++;
+		}
+		return res.toString();
+	}
+
+	private JSONObject getTxtReply(Questions qst) throws JSONException {
+		JSONObject res = new JSONObject();
+		res.put("body",qst.getBody());
+		int type = 0;
+		if(qst.getType().equals("long")) type++;
+		res.put("type",type);
+		res.put("points",qst.getNote());
+		return res;
+	}
+	private JSONObject getCheckReply(Questions qst) throws JSONException {
+		JSONObject res = new JSONObject();
+		res.put("body",qst.getBody());
+		int type = 2;
+		if(qst.getType().equals("single")){
+			res.put("type",(type+1));
+			res.put("points",qst.getNote());
+			JSONArray array = new JSONArray();
+			SingleCheckAnswers ans = (SingleCheckAnswers) qst.getAnswers();
+			for(MultiElement elem : ans.getAnswers()){
+				array.put(elem.toJSONObject());
+			}
+			res.put("rep",array);
+		}else{
+			res.put("type",type);
+			res.put("points",qst.getNote());
+			JSONArray array = new JSONArray();
+			MultiCheckAnswers ans = (MultiCheckAnswers) qst.getAnswers();
+			for(MultiElement elem : ans.getAnswers()){
+				array.put(elem.toJSONObject());
+			}
+			res.put("rep",array);
+		}
+
+		return res;
+	}
+
 }

@@ -44,7 +44,7 @@ public class Class {
 		Groups = groups;
 	}
 
-	@Override
+/*	@Override
 	public String toString() {
 		JSONObject json = new JSONObject();
 		try {
@@ -57,5 +57,13 @@ public class Class {
 			", specialty:'" + specialty + '\'' +
 			", Groups: "+ this.Groups+ "}";
 		return res;
-	}
+	}*/
+
+    public String getListGroups() {
+			String res = "";
+			for (Object grp:this.Groups.toArray()){
+				res+=","+grp;
+			}
+			return res.substring(1);
+    }
 }
