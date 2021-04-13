@@ -27,6 +27,8 @@ import static com.thexcoders.examClasses.Questions.*;
 @RestController
 @CrossOrigin("*")
 public class Controller {
+
+
 	private StudentRepository studentrepo;
 	private ExamRepository examRepo;
 	private TeacherRepo teacherRepo;
@@ -130,7 +132,6 @@ public class Controller {
 	public List<ExamHolder> getAllExams() {
 		return this.examRepo.findAll();
 	}
-
 
 	// getting all exams from a student ( testing )
 	@GetMapping("/exams/allSorted/{studentID}")
@@ -248,6 +249,11 @@ public class Controller {
 		res.put("isOpen",this.examRepo.findById(examId).get().isStarted());
 		res.put("isgoodgood",this.examRepo.findById(examId).get().getExam().getParams().isGoodgood());
 		return res.toString();
+	}
+
+	@GetMapping("/exam/isPassed/{studentId}/{examId}")
+	public boolean isExamStarted(@PathVariable("examId") String examId,@PathVariable("studentId") String id) throws JSONException {
+		return this.studentrepo.findById(id).get().getStudent().indexOfExam(examId)==-1;
 	}
 
 	// getting all exams to display on the "Mes Examens" page
@@ -405,7 +411,6 @@ public class Controller {
 		res.put("nbrQuestions",exam.getParams().getDispQuestions());
 		res.put("profName",this.teacherRepo.findById(exam.getCreatedBy()).get().getTeacher().profName());
 		res.put("isFraudOn",exam.getParams().isFraud());
-
 		return res.toString();
 	}
 
@@ -414,31 +419,35 @@ public class Controller {
 		JSONObject data = new JSONObject(connectedStudent);
 		ArrayList<StuRep> reponses = new ArrayList<>();
 		JSONArray table = data.getJSONArray("reponses");
-
 		for(int i = 0; i<table.length();i++){
 			JSONObject json = table.getJSONObject(i);
 			int type = json.getInt("type");
 			switch (type){
-				case StuRep.LONG:
-					reponses.add(new TextRep(json.getString("value"),json.getInt("index"),json.getDouble("note"),json.getDouble("total")));
+				case 1:
+					reponses.add(new TextRep(json.getString("value"),json.getInt("index"),json.getDouble("note"),json.getDouble("total"),json.getBoolean("isCheating")));
 					break;
-				case StuRep.MULTIPLE:
-					reponses.add(new MultipleRep(json.getJSONArray("value"),json.getInt("index"),json.getDouble("note"),json.getDouble("total")));
+				case 2:
+					reponses.add(new MultipleRep(json.getJSONArray("value"),json.getInt("index"),json.getDouble("note"),json.getDouble("total"),json.getBoolean("isCheating")));
 					break;
-				case StuRep.SHORT:
-					reponses.add(new TextRep(json.getString("value"),json.getInt("index"),json.getDouble("note"),json.getDouble("total")));
+				case 0:
+					reponses.add(new TextRep(json.getString("value"),json.getInt("index"),json.getDouble("note"),json.getDouble("total"),json.getBoolean("isCheating")));
 					break;
-				case StuRep.SINGLE:
-					reponses.add(new SingleRep(json.getString("value"),json.getInt("index"),json.getDouble("note"),json.getDouble("total")));
+				case 3:
+					reponses.add(new SingleRep(json.getString("value"),json.getInt("index"),json.getDouble("note"),json.getDouble("total"),json.getBoolean("isCheating")));
 					break;
 			}
 		}
-		Date start = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse(
-			data.getString("startDate").split("T")[0]+" "+data.getString("startDate").split("T")[1].substring(0,8)
-		);
-		Date end = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse(
-			data.getString("endDate").split("T")[0]+" "+data.getString("endDate").split("T")[1].substring(0,8)
-		);
+		Date start = new Date(data.getString("startDate"));
+		Date end = null;
+		try{
+			end = new Date(data.getString("endDate"));
+			StudentHolder stu = this.studentrepo.findById(data.getString("id")).get();
+			stu.getStudent().UpdateExamStatus(ExamId,StudentExams.FINISHED);
+			this.studentrepo.save(stu);
+		}catch (Exception e){
+			System.err.println("date error");
+		}
+
 		ConnectedStudent coStu = new ConnectedStudent(
 			data.getString("id"),
 			start,
@@ -448,8 +457,14 @@ public class Controller {
 
 		ExamHolder examHolder = this.examRepo.findById(ExamId).get();
 		Exam exam = examHolder.getExam();
-		exam.addConnected(coStu);
+		exam.updateValue(data.getString("id"),reponses,start,end);
 		this.examRepo.save(examHolder);
+	}
+	@GetMapping("exams/addToStudent/{studId}/{examId}")
+	public void addIt(@PathVariable("studId") String id , @PathVariable("examId") String exam){
+		StudentHolder stu = this.studentrepo.findById(id).get();
+		stu.getStudent().getExams().add(new StudentExams(exam,new Date().toString(),new Date().toString(),StudentExams.IN_PROGRESS));
+		this.studentrepo.save(stu);
 	}
 
 	//getting exam's questions and answers

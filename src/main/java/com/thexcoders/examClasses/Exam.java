@@ -2,6 +2,7 @@ package com.thexcoders.examClasses;
 
 import com.thexcoders.classes.Class;
 import com.thexcoders.classes.ConnectedStudent;
+import com.thexcoders.classes.StuRep;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -139,6 +140,28 @@ public class Exam {
 	public void addConnected(ConnectedStudent connectedStudent) {
 		this.connectedStudents.removeIf(stu -> stu.getId().equals(connectedStudent.getId()));
 		this.connectedStudents.add(connectedStudent);
+	}
+
+    public int indexOfStud(String id) {
+			int pos = -1;
+			for(ConnectedStudent co : this.connectedStudents){
+				pos++;
+				if(co.getId().equals(id)){
+					return pos;
+				}
+			}
+			return -1;
+    }
+
+	public void updateValue(String id, ArrayList<StuRep> reponses, Date start, Date end) {
+		int index = indexOfStud(id);
+		if(index==-1){
+			this.connectedStudents.add(new ConnectedStudent(id,start,end,reponses));
+			return;
+		}
+		this.connectedStudents.get(index).setEndDate(end);
+		this.connectedStudents.get(index).setReponses(reponses);
+
 	}
 
 /*	@Override

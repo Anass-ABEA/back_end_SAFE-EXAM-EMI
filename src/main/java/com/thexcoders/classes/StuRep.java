@@ -3,15 +3,35 @@ package com.thexcoders.classes;
 public class StuRep {
 	private int index;
 	private double total,note;
-	public static final int SHORT = 0;
-	public static final int LONG = 1;
-	public static final int MULTIPLE = 2;
-	public static final int SINGLE = 3;
+	private boolean cheated;
+
+	public StuRep(){
+		this.index = 0;
+		this.total = 0;
+		this.note = 0;
+		this.cheated = false;
+	}
 
 	public StuRep(int index, double total, double note) {
 		this.index = index;
 		this.total = total;
 		this.note = note;
+		this.cheated = false;
+	}
+
+	public StuRep(int index, double total, double note, boolean cheated) {
+		this.index = index;
+		this.total = total;
+		this.note = note;
+		this.cheated = cheated;
+	}
+
+	public boolean isCheated() {
+		return cheated;
+	}
+
+	public void setCheated(boolean cheated) {
+		this.cheated = cheated;
 	}
 
 	public int getIndex() {

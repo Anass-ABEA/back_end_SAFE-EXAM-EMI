@@ -9,7 +9,25 @@ public class TextRep  extends StuRep {
 	}
 
 	public TextRep() {
-		super(0,0,0);
+	}
+
+	public TextRep(String value) {
+		this.value = value;
+	}
+
+	public TextRep(int index, double total, double note, String value) {
+		super(index, total, note);
+		this.value = value;
+	}
+
+	public TextRep(int index, double total, double note, boolean cheated, String value) {
+		super(index, total, note, cheated);
+		this.value = value;
+	}
+
+	public TextRep(String value, int index, double note, double total, boolean isCheating) {
+		super(index,total,note,isCheating);
+		this.value = value;
 	}
 
 	public String getValue() {
