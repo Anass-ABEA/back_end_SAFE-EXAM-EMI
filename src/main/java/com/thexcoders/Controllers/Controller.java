@@ -406,7 +406,7 @@ public class Controller {
 		JSONObject res = new JSONObject();
 
 		res.put("title",exam.getTitle());
-		res.put("length",exam.getLength());
+		res.put("len",exam.getLength());
 		res.put("tries","1");
 		res.put("nbrQuestions",exam.getParams().getDispQuestions());
 		res.put("profName",this.teacherRepo.findById(exam.getCreatedBy()).get().getTeacher().profName());
