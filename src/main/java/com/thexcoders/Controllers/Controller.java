@@ -7,19 +7,18 @@ import com.thexcoders.holders.ExamHolder;
 import com.thexcoders.holders.QuestionHolder;
 import com.thexcoders.holders.StudentHolder;
 import com.thexcoders.holders.TeacherHolder;
-import com.thexcoders.repositories.ExamRepository;
-import com.thexcoders.repositories.QuestionRepository;
-import com.thexcoders.repositories.TeacherRepo;
+import com.thexcoders.repositories.*;
 import com.thexcoders.teacherHelperClasses.HomeTeacherExam;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import com.thexcoders.repositories.StudentRepository;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import static com.thexcoders.examClasses.Questions.*;
@@ -33,12 +32,14 @@ public class Controller {
 	private ExamRepository examRepo;
 	private TeacherRepo teacherRepo;
 	private QuestionRepository questionRepo;
+	private AllStudentsRepository allStudentsRepo;
 
-	public Controller(StudentRepository studentrepo, ExamRepository examRepo, TeacherRepo teacherRepo,QuestionRepository questionRepo) {
+	public Controller(StudentRepository studentrepo, ExamRepository examRepo, TeacherRepo teacherRepo,QuestionRepository questionRepo,AllStudentsRepository allstudentsRepo) {
 		this.studentrepo = studentrepo;
 		this.examRepo = examRepo;
 		this.teacherRepo = teacherRepo;
 		this.questionRepo = questionRepo;
+		this.allStudentsRepo= allstudentsRepo;
 	}
 
 	// getting all students
@@ -301,6 +302,72 @@ public class Controller {
 		this.examRepo.save(exam);
 		return true;
 	}
+	@GetMapping("exam/getCoStudents/{examId}")
+	public String getCoStud(@PathVariable("examId") String examId) throws JSONException {
+		JSONArray res = new JSONArray();
+		ArrayList<ConnectedStudent> students =  this.examRepo.findById(examId).get().getExam().getConnectedStudents();
+
+		for (ConnectedStudent costu :students){
+			costu.sortResponces();
+			JSONObject object = new JSONObject();
+			object.put("isbanned",false);
+			object.put("start",String.join("", costu.getStartDate().toString().split(" WET")));
+			object.put("id",costu.getId());
+			object.put("name",this.studentrepo.findById(costu.getId()).get().getStudent().fullName());
+			int note = 0;
+			JSONArray answers = new JSONArray();
+			for(StuRep rep : costu.getReponses()){
+				note+=rep.getTotal();
+				JSONObject temp = new JSONObject();
+				temp.put("isFraud",rep.isCheated());
+				answers.put(temp);
+			}
+
+			object.put("note",note);
+			if(costu.getEndDate()!=null){
+				object.put("qstCourante",costu.getReponses().size());
+			}else{
+				object.put("qstCourante",costu.getCurrentQst());
+			}
+
+			if(costu.getEndDate()==null){
+				object.put("end",null);
+			}else{
+
+				object.put("end",String.join("", costu.getEndDate().toString().split(" WET")));
+			}
+			object.put("answers",answers);
+			res.put(object);
+		}
+		return res.toString();
+	}
+	@GetMapping("exam/getExamInfo/{examId}")
+	public String ExamData(@PathVariable("examId") String examId) throws JSONException {
+		ExamHolder examHolder = this.examRepo.findById(examId).get();
+		Exam exam = examHolder.getExam();
+		JSONObject res = new JSONObject();
+		res.put("title",exam.getTitle());
+
+		JSONObject target = new JSONObject();
+		target.put("promo",exam.getClasse().get(0).getYear());
+		target.put("genie",exam.getClasse().get(0).getSpecialty());
+		String grps ="";
+		for (Object s:exam.getClasse().get(0).getGroups().toArray()){
+			grps+=s.toString();
+		}
+		target.put("grps",grps);
+
+		res.put("target",target);
+		res.put("dateTime",exam.getStart());
+		QuestionHolder qestions= this.questionRepo.findById(examId).get();
+		res.put("qstCount",qestions.getQuestions().size());
+		int note = 0;
+		for (Questions o: qestions.getQuestions()){
+			note+=o.getNote();
+		}
+		res.put("noteGlobal",note);
+		return res.toString();
+	}
 
 	@GetMapping("/teachers/all")
 	public List<TeacherHolder> getAllTeachers() {
@@ -393,6 +460,7 @@ public class Controller {
 			//ERROR TYPE 0 ERROR IN ADDING (exsts already)
 			return result.toString();
 		}
+
 		result.put("isAdded",true);
 		return result.toString();
 	}
@@ -437,27 +505,30 @@ public class Controller {
 					break;
 			}
 		}
-		Date start = new Date(data.getString("startDate"));
+		Date start = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").parse(data.getString("startDate"));
+
 		Date end = null;
 		try{
-			end = new Date(data.getString("endDate"));
+			end = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").parse(data.getString("endDate"));
 			StudentHolder stu = this.studentrepo.findById(data.getString("id")).get();
 			stu.getStudent().UpdateExamStatus(ExamId,StudentExams.FINISHED);
 			this.studentrepo.save(stu);
 		}catch (Exception e){
 			System.err.println("date error");
 		}
-
+		System.err.println("start "+start);
 		ConnectedStudent coStu = new ConnectedStudent(
 			data.getString("id"),
 			start,
 			end,
-			reponses
+			reponses,
+			data.getString("currentQst")
 		);
 
 		ExamHolder examHolder = this.examRepo.findById(ExamId).get();
 		Exam exam = examHolder.getExam();
-		exam.updateValue(data.getString("id"),reponses,start,end);
+		System.err.println("current qst is = "+data.getString("currentQst"));
+		exam.updateValue(data.getString("id"),reponses,start,end,data.getString("currentQst"));
 		this.examRepo.save(examHolder);
 	}
 	@GetMapping("exams/addToStudent/{studId}/{examId}")

@@ -153,15 +153,15 @@ public class Exam {
 			return -1;
     }
 
-	public void updateValue(String id, ArrayList<StuRep> reponses, Date start, Date end) {
+	public void updateValue(String id, ArrayList<StuRep> reponses, Date start, Date end,String CurrentQst) {
 		int index = indexOfStud(id);
 		if(index==-1){
-			this.connectedStudents.add(new ConnectedStudent(id,start,end,reponses));
+			this.connectedStudents.add(new ConnectedStudent(id,start,end,reponses,CurrentQst));
 			return;
 		}
 		this.connectedStudents.get(index).setEndDate(end);
 		this.connectedStudents.get(index).setReponses(reponses);
-
+		this.connectedStudents.get(index).setCurrentQst(CurrentQst);
 	}
 
 /*	@Override

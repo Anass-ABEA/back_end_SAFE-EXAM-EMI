@@ -3,14 +3,8 @@ package com.thexcoders.seeder;
 import com.thexcoders.classes.*;
 import com.thexcoders.classes.Class;
 import com.thexcoders.examClasses.*;
-import com.thexcoders.holders.ExamHolder;
-import com.thexcoders.holders.QuestionHolder;
-import com.thexcoders.holders.StudentHolder;
-import com.thexcoders.holders.TeacherHolder;
-import com.thexcoders.repositories.ExamRepository;
-import com.thexcoders.repositories.QuestionRepository;
-import com.thexcoders.repositories.StudentRepository;
-import com.thexcoders.repositories.TeacherRepo;
+import com.thexcoders.holders.*;
+import com.thexcoders.repositories.*;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -22,12 +16,15 @@ public class DatabaseSeeder implements CommandLineRunner {
 	private final StudentRepository studentRepository;
 	private final TeacherRepo teacherRepo;
 	private final QuestionRepository questionRepo;
+	private final AllStudentsRepository allstudentsRepo;
 
-	public DatabaseSeeder(StudentRepository studentRepository, ExamRepository examrepo, TeacherRepo teacherRepo, QuestionRepository questionRepo) {
+
+	public DatabaseSeeder(StudentRepository studentRepository, ExamRepository examrepo, TeacherRepo teacherRepo, QuestionRepository questionRepo, AllStudentsRepository allstudentsRepo) {
 		this.studentRepository = studentRepository;
 		this.examrepo = examrepo;
 		this.teacherRepo = teacherRepo;
 		this.questionRepo = questionRepo;
+		this.allstudentsRepo = allstudentsRepo;
 	}
 
 	@Override
@@ -35,6 +32,10 @@ public class DatabaseSeeder implements CommandLineRunner {
 
 		//70647bb1b46cf31e5d439e10b6759aze
 		//70647bb1b46cf31e5d439e10b675e9ac
+		AllStudentsHolder allStud = new AllStudentsHolder("INF2020",new ArrayList<>(),new ArrayList<>());
+		allStud.addNewStudent(true,"anassaitbenelarbi");
+		this.allstudentsRepo.save(allStud);
+		this.allstudentsRepo.save(new AllStudentsHolder("IND2020",new ArrayList<>(),new ArrayList<>()));
 
 		ArrayList<StudentExams> list = new ArrayList<>();
 		list.add(new StudentExams("id1", "today", "now", 0));

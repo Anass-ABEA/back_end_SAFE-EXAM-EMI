@@ -73,4 +73,8 @@ public class Student {
 		}
 		return -1;
 	}
+
+	public String fullName() {
+		return this.fname.substring(0,1).toUpperCase()+this.fname.substring(1).toLowerCase()+" "+this.lname.toUpperCase();
+	}
 }
