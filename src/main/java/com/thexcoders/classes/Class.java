@@ -59,11 +59,19 @@ public class Class {
 		return res;
 	}*/
 
-    public String getListGroups() {
-			String res = "";
-			for (Object grp:this.Groups.toArray()){
-				res+=","+grp;
-			}
-			return res.substring(1);
-    }
+	public String getListGroups() {
+		String res = "";
+		for (Object grp : this.Groups.toArray()) {
+			res += "," + grp;
+		}
+		return res.substring(1);
+	}
+
+	public String primaryGroup() {
+		for (Object grp : this.Groups.toArray()) {
+			if ("A".equals(grp)) return "A";
+			if ("B".equals(grp)) return "B";
+		}
+		return "";
+	}
 }

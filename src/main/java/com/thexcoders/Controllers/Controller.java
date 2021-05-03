@@ -3,10 +3,7 @@ package com.thexcoders.Controllers;
 import com.thexcoders.classes.*;
 import com.thexcoders.classes.Class;
 import com.thexcoders.examClasses.*;
-import com.thexcoders.holders.ExamHolder;
-import com.thexcoders.holders.QuestionHolder;
-import com.thexcoders.holders.StudentHolder;
-import com.thexcoders.holders.TeacherHolder;
+import com.thexcoders.holders.*;
 import com.thexcoders.repositories.*;
 import com.thexcoders.teacherHelperClasses.HomeTeacherExam;
 import org.json.JSONArray;
@@ -605,5 +602,45 @@ public class Controller {
 
 		return res;
 	}
+
+	@PostMapping("/addGroup/{groupName}")
+	public boolean addGroup(@RequestBody List<String> ids,@PathVariable("groupName")String groupName) {
+		for(String id :ids){
+			StudentHolder stud = this.studentrepo.findById(id).get();
+			stud.getStudent().getClasse().getGroups().add(groupName);
+			this.studentrepo.save(stud);
+		}
+		return true;
+	}
+
+	@GetMapping("/student/profileDetails/{userId}")
+	public String getStudentProfileDetails(@PathVariable("userId")String userId) {
+		JSONObject res = new JSONObject();
+		Student stud = studentrepo.findById(userId).get().getStudent();
+		try{
+			res.put("fname",stud.getFname());
+			res.put("lname",stud.getLname());
+			res.put("groupe",stud.getClasse().primaryGroup());
+			res.put("year",stud.getClasse().getYear());
+			res.put("genie",stud.getClasse().getSpecialty());
+			res.put("email",userId+"@student.emi.ac.ma");
+		} catch (JSONException e) {
+			return null;
+		}
+		return res.toString();
+	}
+
+
+	@PostMapping("/students/Register/{Groups}")
+	public boolean registerStudent(@RequestBody StudentHolder student,@PathVariable("Groups") String Groups) {
+
+		if (this.studentrepo.existsById(student.getId())) {
+			return false;
+		}
+		student.getStudent().getClasse().setGroups(new HashSet<>(Arrays.asList(Groups)));
+		this.studentrepo.save(student);
+		return true;
+	}
+
 
 }
