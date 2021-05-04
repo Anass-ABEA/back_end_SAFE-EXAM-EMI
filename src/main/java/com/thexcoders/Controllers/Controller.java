@@ -210,6 +210,22 @@ public class Controller {
 		return js.toString();
 	}
 
+	@GetMapping("/exams/getMinDetails/{idExam}")
+	public String getMinExamDetails(@PathVariable("idExam") String idExam){
+		JSONObject res = new JSONObject();
+
+		Exam exam = this.examRepo.findById(idExam).get().getExam();
+
+		try {
+			res.put("title",exam.getTitle());
+			res.put("profName",this.teacherRepo.findById(exam.getCreatedBy()).get().getTeacher().profName());
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+
+		return res.toString();
+	}
+
 
 	// getting sorted exams for a specific user and sorting them to display on the calendar
 	@GetMapping("/exams/StudentExams/{studentID}")
@@ -630,10 +646,8 @@ public class Controller {
 		return res.toString();
 	}
 
-
 	@PostMapping("/students/Register/{Groups}")
 	public boolean registerStudent(@RequestBody StudentHolder student,@PathVariable("Groups") String Groups) {
-
 		if (this.studentrepo.existsById(student.getId())) {
 			return false;
 		}
@@ -642,5 +656,79 @@ public class Controller {
 		return true;
 	}
 
+	@GetMapping("/exams/responses/{idExam}/{idStudent}")
+	public ArrayList<StuRep> getResponses(@PathVariable("idExam") String idExam,@PathVariable("idStudent") String idStudent){
+		String res = "";
+
+		ConnectedStudent student= this.examRepo.findById(idExam).get().getExam().getConnectedStudent(idStudent);
+		if(student== null) return null;
+
+		ArrayList<StuRep> listRep = student.getReponses();
+
+		return listRep;
+	}
+
+	@GetMapping("/exams/responses2/{idExam}/{idStudent}")
+	public String getResponses2(@PathVariable("idExam") String idExam,@PathVariable("idStudent") String idStudent){
+		String res = "[";
+
+		ConnectedStudent student= this.examRepo.findById(idExam).get().getExam().getConnectedStudent(idStudent);
+		if(student== null) return null;
+
+		ArrayList<StuRep> listRep = student.getReponses();
+		for(StuRep rep :listRep){
+			res+=rep.stringifty();
+		}
+		res+="]";
+
+		return res;
+	}
+
+	@GetMapping("/exams/MyProfExams/{idProf}")
+	public String getProfExams(@PathVariable("idProf") String idProf){
+		JSONArray holder = new JSONArray();
+		JSONArray olld = new JSONArray();
+		JSONArray neew = new JSONArray();
+
+		Date now = new Date();
+		now.setHours(0);
+		now.setMinutes(0);
+
+		for(String examId:this.teacherRepo.findById(idProf).get().getTeacher().getExamList()){
+			ExamHolder eh = this.examRepo.findById(examId).get();
+			JSONObject object = new JSONObject();
+			try {
+				object.put("id",examId);
+				object.put("title",eh.getExam().getTitle());
+				object.put("start",eh.getExam().getStart());
+				object.put("length",eh.getExam().getLength());
+
+				JSONObject classe= new JSONObject();
+				classe.put("speciality",eh.getExam().getClasse().get(0).getSpecialty());
+				classe.put("groups",eh.getExam().getClasse().get(0).getListGroups());
+				classe.put("year",eh.getExam().getClasse().get(0).getYear());
+
+				object.put("class",classe);
+				object.put("visible",eh.isVisible());
+				object.put("started",eh.isStarted());
+
+				if(now.compareTo(eh.getExam().getStart())<0){
+					neew.put(object);
+				}else{
+					olld.put(object);
+				}
+
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+
+
+		}
+
+		holder.put(neew);
+		holder.put(olld);
+
+		return holder.toString();
+	}
 
 }

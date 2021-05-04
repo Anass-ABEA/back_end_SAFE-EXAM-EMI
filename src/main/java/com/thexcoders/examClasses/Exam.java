@@ -164,6 +164,19 @@ public class Exam {
 		this.connectedStudents.get(index).setCurrentQst(CurrentQst);
 	}
 
+	public ConnectedStudent getConnectedStudent(String id){
+		int index = -1;
+		for (int i = 0; i < this.connectedStudents.size(); i++) {
+			if(id.equals(connectedStudents.get(i).getId())){
+				index = i;
+				break;
+			}
+		}
+		if(index==-1) return null;
+
+		return connectedStudents.get(index);
+	}
+
 /*	@Override
 	public String toString() {
 		return "{" +

@@ -57,4 +57,15 @@ public class StuRep {
 	public void setNote(double note) {
 		this.note = note;
 	}
+
+	public String stringifty() {
+		return "{" +
+			"index:" + index +
+			", total:" + total +
+			", note:" + note +
+			", cheated:" + cheated +
+			'}';
+	}
+
+
 }

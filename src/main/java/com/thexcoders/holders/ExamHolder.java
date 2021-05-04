@@ -70,7 +70,6 @@ public class ExamHolder implements Comparable<ExamHolder> {
 	}
 
 
-
 	@Override
 	public int compareTo(ExamHolder o) {
 		return this.getExam().getStart().compareTo(o.getExam().getStart());
