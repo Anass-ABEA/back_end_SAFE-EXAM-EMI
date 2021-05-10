@@ -3,7 +3,6 @@
 #ARG WAR_FILE=./target/*.jar
 #
 #COPY ${WAR_FILE} webapp.jar
-#
 #CMD ["java",  "-jar", "webapp.jar"]
 
 FROM adoptopenjdk:11-jre-hotspot as builder
