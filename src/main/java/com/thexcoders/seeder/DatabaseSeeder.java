@@ -32,7 +32,7 @@ public class DatabaseSeeder implements CommandLineRunner {
 
 		//70647bb1b46cf31e5d439e10b6759aze
 		//70647bb1b46cf31e5d439e10b675e9ac
-		AllStudentsHolder allStud = new AllStudentsHolder("INF2020",new ArrayList<>(),new ArrayList<>());
+		/*AllStudentsHolder allStud = new AllStudentsHolder("INF2020",new ArrayList<>(),new ArrayList<>());
 		allStud.addNewStudent(true,"anassaitbenelarbi");
 		this.allstudentsRepo.save(allStud);
 		this.allstudentsRepo.save(new AllStudentsHolder("IND2020",new ArrayList<>(),new ArrayList<>()));
@@ -124,6 +124,6 @@ public class DatabaseSeeder implements CommandLineRunner {
 				new MultiElement("Système d'exploitation",true))));
 		Questions q1 = new Questions("Que signifie SE?","single",2,answers);
 
-		this.questionRepo.save(new QuestionHolder("70647bb1b46cf31e5d439e10b6759aze",new ArrayList<>(Arrays.asList(q,q1))));
+		this.questionRepo.save(new QuestionHolder("70647bb1b46cf31e5d439e10b6759aze",new ArrayList<>(Arrays.asList(q,q1))));*/
 	}
 }
