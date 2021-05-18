@@ -7,6 +7,7 @@ public class Student {
 	String fname;
 	String lname;
 	String password;
+	String pic;
 	Class classe;
 	ArrayList<StudentExams> exams = new ArrayList<>();
 
@@ -76,5 +77,13 @@ public class Student {
 
 	public String fullName() {
 		return this.fname.substring(0,1).toUpperCase()+this.fname.substring(1).toLowerCase()+" "+this.lname.toUpperCase();
+	}
+
+	public String getPic() {
+		return pic;
+	}
+
+	public void setPic(String pic) {
+		this.pic = pic;
 	}
 }

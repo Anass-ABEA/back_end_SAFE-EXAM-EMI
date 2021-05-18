@@ -119,6 +119,7 @@ public class Controller {
 		String name = stu.getStudent().getFname() + " " + stu.getStudent().getLname().substring(0, 1) + ".";
 		try {
 			json.put("name", name);
+			json.put("pic", stu.getStudent().getPic());
 			return json.toString();
 		} catch (JSONException e) {
 			return e.toString();
@@ -639,6 +640,7 @@ public class Controller {
 			res.put("groupe",stud.getClasse().primaryGroup());
 			res.put("year",stud.getClasse().getYear());
 			res.put("genie",stud.getClasse().getSpecialty());
+			res.put("pic",stud.getPic());
 			res.put("email",userId+"@student.emi.ac.ma");
 		} catch (JSONException e) {
 			return null;
@@ -652,6 +654,7 @@ public class Controller {
 			return false;
 		}
 		student.getStudent().getClasse().setGroups(new HashSet<>(Arrays.asList(Groups)));
+		student.getStudent().setExams(new ArrayList<>());
 		this.studentrepo.save(student);
 		return true;
 	}
@@ -730,5 +733,30 @@ public class Controller {
 
 		return holder.toString();
 	}
+
+	@PostMapping("/profs/Register")
+	public boolean registerTeacher(@RequestBody TeacherHolder teacher) {
+		if (this.teacherRepo.existsById(teacher.getId())) {
+			return false;
+		}
+		teacher.getTeacher().setExamList(new ArrayList<>());
+		teacher.getTeacher().setCustomGroups(new ArrayList<>());
+		this.teacherRepo.save(teacher);
+		return true;
+	}
+
+	// updating student photo
+	@PostMapping("/students/connect/{email}")
+	public Boolean updatePhoto(@PathVariable("email") String email,@RequestBody String body) {
+		StudentHolder stu = this.studentrepo.findById(email).get();
+
+		stu.getStudent().setPic(body);
+		System.err.println(body.length());
+		this.studentrepo.save(stu);
+		return true;
+	}
+
+
+
 
 }

@@ -1,10 +1,3 @@
-#FROM openjdk:14-alpine
-#
-#ARG WAR_FILE=./target/*.jar
-#
-#COPY ${WAR_FILE} webapp.jar
-#CMD ["java",  "-jar", "webapp.jar"]
-
 FROM adoptopenjdk:11-jre-hotspot as builder
 ARG JAR_FILE=target/*.jar
 COPY ${JAR_FILE} application.jar
