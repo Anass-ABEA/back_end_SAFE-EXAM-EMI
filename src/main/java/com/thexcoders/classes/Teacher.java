@@ -8,6 +8,7 @@ public class Teacher {
 	private String password;
 	private ArrayList<String> examIds;
 	private ArrayList<String> customGroups;
+	private String pic = "";
 
 	public Teacher(String fname, String lname, String password, ArrayList<String> examList, ArrayList<String> grps) {
 		this.setFname(fname);
@@ -15,6 +16,14 @@ public class Teacher {
 		this.examIds = examList;
 		this.password = password;
 		this.customGroups = grps;
+	}
+	public Teacher(String fname, String lname, String password, ArrayList<String> examList, ArrayList<String> grps, String pic) {
+		this.setFname(fname);
+		this.setLname(lname);
+		this.examIds = examList;
+		this.password = password;
+		this.customGroups = grps;
+		this.pic = pic;
 	}
 
 	public ArrayList<String> getCustomGroups() {
@@ -60,6 +69,10 @@ public class Teacher {
 		this.lname = lname;
 	}
 
+	public void setPic(String pic) {
+		this.pic = pic;
+	}
+
 	public String[] profInfo() {
 		return new String[]{this.fname, this.lname};
 	}
@@ -72,7 +85,12 @@ public class Teacher {
 		return true;
 	}
 
+
 	public String profName(){
 		return lname.toUpperCase()+" "+fname.substring(0,1).toUpperCase()+".";
+	}
+
+	public String getPic() {
+		return this.pic;
 	}
 }

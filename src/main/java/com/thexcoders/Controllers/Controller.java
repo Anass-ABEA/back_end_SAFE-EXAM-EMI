@@ -413,6 +413,7 @@ public class Controller {
 		String name = stu.getTeacher().getFname() + " " + stu.getTeacher().getLname().substring(0, 1) + ".";
 		try {
 			json.put("name", name);
+			json.put("pic",stu.getTeacher().getPic());
 			return json.toString();
 		} catch (JSONException e) {
 			return e.toString();
@@ -756,6 +757,44 @@ public class Controller {
 		return true;
 	}
 
+	@GetMapping("/professor/profileDetails/{userId}")
+	public String getProfessorProfileDetails(@PathVariable("userId")String userId) {
+		JSONObject res = new JSONObject();
+		Teacher stud = teacherRepo.findById(userId).get().getTeacher();
+		try{
+			res.put("fname",stud.getFname());
+			res.put("lname",stud.getLname());
+			res.put("nbrExam",stud.getExamList().size());
+			res.put("pic",stud.getPic());
+			res.put("email",userId+"@emi.ac.ma");
+		} catch (JSONException e) {
+			return null;
+		}
+		return res.toString();
+	}
+
+	@PostMapping("/teachers/update/{studentID}")
+	public boolean updateProf(@PathVariable("studentID") String id, @RequestBody String password) {
+		TeacherHolder stud = this.teacherRepo.findById(id).get();
+		try {
+			if (password.length() != 32) throw new Exception("PASS INCORRECT");
+			stud.getTeacher().setPassword(password);
+			this.teacherRepo.save(stud);
+		} catch (Exception e) {
+			return false;
+		}
+		return true;
+	}
+
+	@PostMapping("/teachers/updateImage/{email}")
+	public Boolean updatePhotoTeacher(@PathVariable("email") String email,@RequestBody String body) {
+		TeacherHolder stu = this.teacherRepo.findById(email).get();
+
+		stu.getTeacher().setPic(body);
+		System.err.println(body.length());
+		this.teacherRepo.save(stu);
+		return true;
+	}
 
 
 
