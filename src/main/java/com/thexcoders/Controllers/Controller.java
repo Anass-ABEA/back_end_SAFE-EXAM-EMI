@@ -796,6 +796,49 @@ public class Controller {
 		return true;
 	}
 
+	@GetMapping("students/getExamDetails/{examID}")
+	public String getExamData(@PathVariable("examID") String idExam){
+		ExamHolder exh = this.examRepo.findById(idExam).get();
+		JSONObject json = new JSONObject();
 
+		try {
+			Calendar c = Calendar.getInstance();
+			c.setTime(exh.getExam().getStart());
+			String date = c.get(Calendar.DATE)+"/"+c.get(Calendar.MONTH)+"/"+c.get(Calendar.YEAR);
+			String time = "";
+			if(c.get(Calendar.HOUR)<10){
+				time+="0";
+			}
+			time+=c.get(Calendar.HOUR)+":";
+			if(c.get(Calendar.MINUTE)<10){
+				time+="0";
+			}
+			time+=c.get(Calendar.MINUTE);
+
+			JSONObject length = new JSONObject();
+			String h = exh.getExam().getLength().split("h")[0];
+			if(h.length()==1){
+				length.put("h","0"+h);
+			}
+			String m = exh.getExam().getLength().split("h")[1];
+			if(m.length()==1){
+				length.put("m","0"+m);
+			}
+			json.put("length",length);
+			json.put("title",exh.getExam().getTitle());
+			json.put("date",date);
+			json.put("time",time);
+			json.put("prof",this.teacherRepo.findById(exh.getExam().getCreatedBy()).get().getTeacher().profName());
+			json.put("profEmail",exh.getExam().getCreatedBy()+"@emi.ac.ma");
+			json.put("note",0);
+			json.put("total",exh.getExam().getParams().getNote());
+			json.put("nbrQuestions",exh.getExam().getParams().getDispQuestions());
+
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+
+		return json.toString();
+	}
 
 }
