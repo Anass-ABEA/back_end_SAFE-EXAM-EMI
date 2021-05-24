@@ -537,7 +537,8 @@ public class Controller {
 			start,
 			end,
 			reponses,
-			data.getString("currentQst")
+			data.getString("currentQst"),
+			false
 		);
 
 		ExamHolder examHolder = this.examRepo.findById(ExamId).get();
@@ -552,6 +553,24 @@ public class Controller {
 		stu.getStudent().getExams().add(new StudentExams(exam,new Date().toString(),new Date().toString(),StudentExams.IN_PROGRESS));
 		this.studentrepo.save(stu);
 	}
+	@GetMapping("exams/isbanned/{studId}/{examId}")
+	public String isBanned(@PathVariable("studId") String id , @PathVariable("examId") String exam){
+		try{
+			return ""+this.examRepo.findById(exam).get().getExam().getConnectedStudent(id).isBanned();
+		}catch (Exception e){
+			return "false";
+		}
+	}
+
+	@GetMapping("exams/ban/{studId}/{examId}")
+	public void banStudent(@PathVariable("studId") String id , @PathVariable("examId") String exam){
+		System.err.println("banning student "+id + " from exam "+ exam);
+		ExamHolder exh = this.examRepo.findById(exam).get();
+		exh.getExam().getConnectedStudent(id).setBanned(true);
+		this.examRepo.save(exh);
+		System.err.println(""+this.examRepo.findById(exam).get().getExam().getConnectedStudent(id).isBanned());
+	}
+
 
 	//getting exam's questions and answers
 	@RequestMapping(value = "/exams/questions/{examId}", method = RequestMethod.GET,
@@ -824,6 +843,7 @@ public class Controller {
 			if(m.length()==1){
 				length.put("m","0"+m);
 			}
+			json.put("canSeeRes",exh.getExam().getParams().isShowResults());
 			json.put("length",length);
 			json.put("title",exh.getExam().getTitle());
 			json.put("date",date);

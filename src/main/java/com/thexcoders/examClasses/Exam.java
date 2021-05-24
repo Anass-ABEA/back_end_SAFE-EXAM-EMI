@@ -156,7 +156,7 @@ public class Exam {
 	public void updateValue(String id, ArrayList<StuRep> reponses, Date start, Date end,String CurrentQst) {
 		int index = indexOfStud(id);
 		if(index==-1){
-			this.connectedStudents.add(new ConnectedStudent(id,start,end,reponses,CurrentQst));
+			this.connectedStudents.add(new ConnectedStudent(id,start,end,reponses,CurrentQst,false));
 			return;
 		}
 		this.connectedStudents.get(index).setEndDate(end);

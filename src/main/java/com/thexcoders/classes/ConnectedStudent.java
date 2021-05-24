@@ -8,6 +8,7 @@ public class ConnectedStudent {
 	private String id;
 	private String currentQst;
 	private Date startDate,endDate;
+	private boolean banned;
 	ArrayList<StuRep> reponses;
 
 	public void sortResponces(){
@@ -19,12 +20,21 @@ public class ConnectedStudent {
 		});
 	}
 
-	public ConnectedStudent(String id, Date startDate, Date endDate, ArrayList<StuRep> reponses,String currentQst) {
+	public boolean isBanned() {
+		return banned;
+	}
+
+	public void setBanned(boolean banned) {
+		this.banned = banned;
+	}
+
+	public ConnectedStudent(String id, Date startDate, Date endDate, ArrayList<StuRep> reponses, String currentQst, boolean banned) {
 		this.id = id;
 		this.startDate = startDate;
 		this.endDate = endDate;
 		this.reponses = reponses;
 		this.currentQst = currentQst;
+		this.banned = false;
 	}
 
 	public String getCurrentQst() {
