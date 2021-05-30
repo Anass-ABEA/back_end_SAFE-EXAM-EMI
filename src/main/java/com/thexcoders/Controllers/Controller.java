@@ -54,6 +54,17 @@ public class Controller {
 		this.studentrepo.insert(student);
 		return true;
 	}
+	@GetMapping("/examsss/{createdBy}")
+	public ArrayList<ExamHolder> getExamsProf(@PathVariable("createdBy") String createdby){
+		ArrayList<ExamHolder> allexams = (ArrayList<ExamHolder>) this.examRepo.findAll();
+		ArrayList<ExamHolder> concernedExam = new ArrayList<>();
+		for (ExamHolder examholder :allexams) {
+			if(examholder.getExam().getCreatedBy().equals(createdby) && examholder.getExam().getConnectedStudents().size() >=1){
+				concernedExam.add(examholder);
+			}
+		}
+		return concernedExam;
+	}
 
 	// updating student info ( testing )
 	@PostMapping("/students/update")
