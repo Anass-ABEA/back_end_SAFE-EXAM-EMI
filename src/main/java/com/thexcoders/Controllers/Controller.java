@@ -187,9 +187,11 @@ public class Controller {
 	@GetMapping("/exams/3examsSorted/{studentID}")
 	public String get3ExamsSorted(@PathVariable("studentID") String id) throws JSONException {
 		ArrayList<ExamHolder> exams = (ArrayList<ExamHolder>) this.getAllExams();
+		System.err.println("exam size = "+exams.size());
 		Collections.sort(exams, Collections.reverseOrder());
 		int i = 0;
 		exams.removeIf(exam -> exam.getExam().getStart().compareTo(new Date()) < 0);
+		System.err.println("exam sorted and cleaned = "+exams.size());
 		JSONArray js = new JSONArray();
 		Class studentClass = this.studentrepo.findById(id).get().getStudent().getClasse();
 		String spec = studentClass.getSpecialty();
@@ -859,6 +861,43 @@ public class Controller {
 		}
 
 		return json.toString();
+	}
+
+	@GetMapping("student/Scores/{studentID}")
+	public String getExamsByStudentID(@PathVariable("studentID")String id){
+		JSONObject res = new JSONObject();
+		try {
+			res.put("nomEtud",this.studentrepo.findById(id).get().getStudent().fullName());
+			JSONArray array = new JSONArray();
+			ArrayList<StudentExams> ex = this.studentrepo.findById(id).get().getStudent().getExams();
+			ex.remove(0);
+			float total= 0, note = 0;
+			for(StudentExams exam : ex){
+				String idEXAM = exam.getId();
+				Exam myExam = this.examRepo.findById(idEXAM).get().getExam();
+				ConnectedStudent  stud = this.examRepo.findById(idEXAM).get().getExam().getConnectedStudent(id);
+				JSONObject json = new JSONObject();
+				json.put("nomeeaxam", myExam.getTitle());
+				json.put("dateexam", myExam.getStart());
+				json.put("prof", this.teacherRepo.findById(myExam.getCreatedBy()).get().getTeacher().profName());
+
+				for(StuRep o : stud.getReponses()){
+					total+=o.getNote();
+					note += o.getTotal();
+				}
+
+				json.put("idConnectedStu",stud);
+				json.put("idExam", idEXAM);
+				json.put("note", note);
+				json.put("bareme", total);
+				array.put(json);
+			}
+			res.put("listeExamens",array);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+
+		return res.toString();
 	}
 
 }
