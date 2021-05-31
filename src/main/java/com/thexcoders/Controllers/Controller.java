@@ -326,7 +326,7 @@ public class Controller {
 		for (ConnectedStudent costu :students){
 			costu.sortResponces();
 			JSONObject object = new JSONObject();
-			object.put("isbanned",false);
+			object.put("isbanned",costu.isBanned());
 			object.put("start",String.join("", costu.getStartDate().toString().split(" WET")));
 			object.put("id",costu.getId());
 			object.put("name",this.studentrepo.findById(costu.getId()).get().getStudent().fullName());
@@ -716,8 +716,6 @@ public class Controller {
 		JSONArray neew = new JSONArray();
 
 		Date now = new Date();
-		now.setHours(0);
-		now.setMinutes(0);
 
 		for(String examId:this.teacherRepo.findById(idProf).get().getTeacher().getExamList()){
 			ExamHolder eh = this.examRepo.findById(examId).get();
@@ -862,5 +860,61 @@ public class Controller {
 
 		return json.toString();
 	}
+
+	@GetMapping("student/Scores/{studentID}")
+	public String getExamsByStudentID(@PathVariable("studentID")String id){
+		JSONObject res = new JSONObject();
+		try {
+			res.put("nomEtud",this.studentrepo.findById(id).get().getStudent().fullName());
+			JSONArray array = new JSONArray();
+			ArrayList<StudentExams> ex = this.studentrepo.findById(id).get().getStudent().getExams();
+			ex.remove(0);
+			float total= 0, note = 0;
+			for(StudentExams exam : ex){
+				String idEXAM = exam.getId();
+				Exam myExam = this.examRepo.findById(idEXAM).get().getExam();
+				ConnectedStudent  stud = this.examRepo.findById(idEXAM).get().getExam().getConnectedStudent(id);
+				JSONObject json = new JSONObject();
+				json.put("nomeeaxam", myExam.getTitle());
+				json.put("dateexam", myExam.getStart());
+				json.put("prof", this.teacherRepo.findById(myExam.getCreatedBy()).get().getTeacher().profName());
+
+				for(StuRep o : stud.getReponses()){
+					total+=o.getNote();
+//					System.err.println(total);
+					note += o.getTotal();
+//					System.err.println(note);
+				}
+
+				json.put("idConnectedStu",stud);
+				json.put("idExam", idEXAM);
+				json.put("note", note);
+				json.put("bareme", total);
+				array.put(json);
+			}
+			res.put("listeExamens",array);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+
+//		return res.toString();
+		return res.toString();
+	}
+
+
+
+	//getting all the finished exams creating by "createdBy" instructor
+	@GetMapping("/examsss/{createdBy}")
+	public ArrayList<ExamHolder> getExamsProf(@PathVariable("createdBy") String createdby){
+		ArrayList<ExamHolder> allexams = (ArrayList<ExamHolder>) this.examRepo.findAll();
+		ArrayList<ExamHolder> concernedExam = new ArrayList<>();
+		for (ExamHolder examholder :allexams) {
+			if(examholder.getExam().getCreatedBy().equals(createdby) && examholder.getExam().getConnectedStudents().size() >=1){
+				concernedExam.add(examholder);
+			}
+		}
+		return concernedExam;
+	}
+
 
 }
