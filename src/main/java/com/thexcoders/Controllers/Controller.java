@@ -12,6 +12,7 @@ import org.json.JSONObject;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import java.lang.reflect.Array;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -187,11 +188,9 @@ public class Controller {
     @GetMapping("/exams/3examsSorted/{studentID}")
     public String get3ExamsSorted(@PathVariable("studentID") String id) throws JSONException {
         ArrayList<ExamHolder> exams = (ArrayList<ExamHolder>) this.getAllExams();
-        System.err.println("exam size = " + exams.size());
         Collections.sort(exams, Collections.reverseOrder());
         int i = 0;
         exams.removeIf(exam -> exam.getExam().getStart().compareTo(new Date()) < 0);
-        System.err.println("exam sorted and cleaned = " + exams.size());
         JSONArray js = new JSONArray();
         Class studentClass = this.studentrepo.findById(id).get().getStudent().getClasse();
         String spec = studentClass.getSpecialty();
@@ -838,8 +837,8 @@ public class Controller {
         return true;
     }
 
-    @GetMapping("students/getExamDetails/{examID}")
-    public String getExamData(@PathVariable("examID") String idExam) {
+    @GetMapping("students/getExamDetails/{examID}/{id}")
+    public String getExamData(@PathVariable("examID") String idExam,@PathVariable("id") String id) {
         ExamHolder exh = this.examRepo.findById(idExam).get();
         JSONObject json = new JSONObject();
 
@@ -873,7 +872,11 @@ public class Controller {
             json.put("time", time);
             json.put("prof", this.teacherRepo.findById(exh.getExam().getCreatedBy()).get().getTeacher().profName());
             json.put("profEmail", exh.getExam().getCreatedBy() + "@emi.ac.ma");
-            json.put("note", 0);
+            int note = 0;
+            for(StuRep stuRep :exh.getExam().getConnectedStudent(id).getReponses()){
+                note+= stuRep.getNote();
+            }
+            json.put("note", note);
             json.put("total", exh.getExam().getParams().getNote());
             json.put("nbrQuestions", exh.getExam().getParams().getDispQuestions());
 
@@ -903,10 +906,8 @@ public class Controller {
                 json.put("prof", this.teacherRepo.findById(myExam.getCreatedBy()).get().getTeacher().profName());
 
                 for (StuRep o : stud.getReponses()) {
-                    total += o.getNote();
-//					System.err.println(total);
-                    note += o.getTotal();
-//					System.err.println(note);
+                    total += o.getTotal();
+                    note += o.getNote();
                 }
 
                 json.put("idConnectedStu", stud);
@@ -979,6 +980,7 @@ public class Controller {
             obj.put("id",str);
             Student sttudent = this.studentrepo.findById(str).get().getStudent();
             obj.put("name",sttudent.getFname()+" "+sttudent.getLname().toUpperCase());
+            obj.put("selected",false);
             grpA.put(obj);
         }
 
@@ -987,14 +989,108 @@ public class Controller {
             obj.put("id",str);
             Student sttudent = this.studentrepo.findById(str).get().getStudent();
             obj.put("name",sttudent.getFname()+" "+sttudent.getLname().toUpperCase());
+            obj.put("selected",false);
             grpB.put(obj);
         }
         res.put(grpA);
         res.put(grpB);
         return res.toString();
-
     }
 
+    @PostMapping("/newGroup/{geniePromo}/{grpName}/{prof}")
+    public boolean addNewGroupe(@PathVariable("geniePromo") String id,@PathVariable("grpName") String grp,@PathVariable("prof") String profID,@RequestBody ArrayList<String> list){
+        for(String studentId : list){
+            StudentHolder student = this.studentrepo.findById(studentId).get();
+            student.getStudent().getClasse().add(grp);
+            this.studentrepo.save(student);
+        }
+
+        TeacherHolder holder = this.teacherRepo.findById(profID).get();
+        holder.getTeacher().addNewGroup(grp);
+        this.teacherRepo.save(holder);
+
+
+        return true;
+    }
+
+    @GetMapping("getGroupfromProf/{idProf}")
+    public ArrayList<String> getProfGrp(@PathVariable("idProf") String id){
+        return this.teacherRepo.findById(id).get().getTeacher().getCustomGroups();
+    }
+
+    @GetMapping("/students/{studentID}")
+    public StudentHolder getStudent_(@PathVariable("studentID") String studentID ){
+        StudentHolder stud = this.studentrepo.findById(studentID).get();
+        return stud;
+    }
+
+    @GetMapping("ExamsProfsCartes/{profId}")
+    public  String getExamCards(@PathVariable("profId") String id) throws JSONException {
+        JSONArray array = new JSONArray();
+        TeacherHolder teacherHolder = teacherRepo.findById(id).get();
+        for(String examId :teacherHolder.getTeacher().getExamList()){
+            JSONObject json = new JSONObject();
+            ExamHolder exam = examRepo.findById(examId).get();
+            json.put("title",exam.getExam().getTitle());
+            json.put("date",exam.getExam().getStart());
+            json.put("genie",exam.getExam().getClasse().get(0).getSpecialty());
+            json.put("promo",exam.getExam().getClasse().get(0).getYear());
+            json.put("id",exam.getId());
+            json.put("nbrParticipants",exam.getExam().getConnectedStudents().size());
+            array.put(json);
+        }
+
+        return array.toString();
+    }
+
+    @GetMapping("getStudents/{examId}")
+    public String getStudentExam(@PathVariable("examId") String examId) throws JSONException {
+        JSONArray array = new JSONArray();
+        ArrayList<ConnectedStudent> list = this.examRepo.findById(examId).get().getExam().getConnectedStudents();
+
+        for(ConnectedStudent stud : list){
+            JSONObject object = new JSONObject();
+            StudentHolder studentHolder = this.studentrepo.findById(stud.getId()).get();
+
+            object.put("id",studentHolder.getId());
+            object.put("fname",studentHolder.getStudent().getFname());
+            object.put("lname",studentHolder.getStudent().getLname());
+            int note = 0;
+            int total = 0;
+            int fraude = 0;
+            for(StuRep rep :stud.getReponses()){
+                note+= rep.getNote();
+                total+= rep.getTotal();
+                if(rep.isCheated()){
+                    fraude++;
+                }
+            }
+            object.put("tentativesDeFraude",fraude);
+            object.put("note",note+" / "+total);
+            array.put(object);
+        }
+
+        return array.toString();
+    }
+
+    @PostMapping("/updateMark/{idStu}/{idExam}")
+    public boolean UpdateStudentMark(@PathVariable("idStu") String idStu,@PathVariable("idExam") String idExam,@RequestBody ArrayList<StuRep> liste){
+        ExamHolder examHolder = this.examRepo.findById(idExam).get();
+        examHolder.getExam().getConnectedStudent(idStu).setReponses(liste);
+        this.examRepo.save(examHolder);
+        return true;
+    }
+
+    @GetMapping("/getExamHeader/{idExam}/{idStu}")
+    public String getExamHedaer(@PathVariable("idStu") String idStu,@PathVariable("idExam") String idExam) throws JSONException {
+        JSONObject json = new JSONObject();
+        ExamHolder examHolder = this.examRepo.findById(idExam).get();
+
+        json.put("name",examHolder.getExam().getTitle());
+        json.put("nomEtudiant",this.studentrepo.findById(idStu).get().getStudent().getFullName());
+
+        return json.toString();
+    }
 
 
 }

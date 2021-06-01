@@ -74,4 +74,8 @@ public class Class {
 		}
 		return "";
 	}
+
+	public boolean add(String o) {
+		return Groups.add(o);
+	}
 }

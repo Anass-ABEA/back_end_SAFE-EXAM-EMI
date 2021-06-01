@@ -86,4 +86,8 @@ public class Student {
 	public void setPic(String pic) {
 		this.pic = pic;
 	}
+
+	public String getFullName() {
+		return this.fname+ " "+ this.lname.toUpperCase();
+	}
 }

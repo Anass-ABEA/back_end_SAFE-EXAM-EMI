@@ -93,4 +93,8 @@ public class Teacher {
 	public String getPic() {
 		return this.pic;
 	}
+
+	public void addNewGroup(String grpName){
+		this.customGroups.add(grpName);
+	}
 }
