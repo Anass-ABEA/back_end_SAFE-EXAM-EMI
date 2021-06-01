@@ -54,6 +54,7 @@ public class Controller {
 		this.studentrepo.insert(student);
 		return true;
 	}
+	//getting all the finished exams creating by "createdBy" instructor
 	@GetMapping("/examsss/{createdBy}")
 	public ArrayList<ExamHolder> getExamsProf(@PathVariable("createdBy") String createdby){
 		ArrayList<ExamHolder> allexams = (ArrayList<ExamHolder>) this.examRepo.findAll();
@@ -64,6 +65,17 @@ public class Controller {
 			}
 		}
 		return concernedExam;
+	}
+	@GetMapping("/exam/{QuestionsID}")
+	public QuestionHolder getQuestionsExam(@PathVariable("QuestionsID") String QuestionsID){
+		QuestionHolder questions = this.questionRepo.findById(QuestionsID).get();
+		return questions;
+	}
+	//getting a single student
+	@GetMapping("/students/{studentID}")
+	public StudentHolder getStudent_(@PathVariable("studentID") String studentID ){
+		StudentHolder stud = this.studentrepo.findById(studentID).get();
+		return stud;
 	}
 
 	// updating student info ( testing )

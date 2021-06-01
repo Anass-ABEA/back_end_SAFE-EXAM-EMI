@@ -5,9 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="13711b3b-b1f0-4ab9-99ee-a378874ec280" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/see.iml" beforeDir="false" afterPath="$PROJECT_DIR$/see.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/thexcoders/Controllers/Controller.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/thexcoders/Controllers/Controller.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -42,6 +40,7 @@
     <property name="aspect.path.notification.shown" value="true" />
     <property name="com.intellij.openapi.externalSystem.service.settings.ExternalSystemGroupConfigurable" value="ALL" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="nodejs_package_manager_path" value="npm" />
     <property name="project.structure.last.edited" value="Artifacts" />
     <property name="project.structure.proportion" value="0.0" />
     <property name="project.structure.side.proportion" value="0.2" />
@@ -196,7 +195,10 @@
       <updated>1615919647072</updated>
       <workItem from="1621896260602" duration="3154000" />
       <workItem from="1622014615356" duration="364000" />
-      <workItem from="1622399300768" duration="5185000" />
+      <workItem from="1622399300768" duration="5888000" />
+      <workItem from="1622465152738" duration="2731000" />
+      <workItem from="1622483997631" duration="1515000" />
+      <workItem from="1622493429199" duration="643000" />
     </task>
     <servers />
   </component>
