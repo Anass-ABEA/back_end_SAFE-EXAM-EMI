@@ -906,8 +906,8 @@ public class Controller {
                 json.put("prof", this.teacherRepo.findById(myExam.getCreatedBy()).get().getTeacher().profName());
 
                 for (StuRep o : stud.getReponses()) {
-                    total += o.getTotal();
-                    note += o.getNote();
+                    total += o.getNote();
+                    note += o.getTotal();
                 }
 
                 json.put("idConnectedStu", stud);
