@@ -35,6 +35,31 @@ public class Questions {
 		}
 	}
 
+	public Questions(JSONObject data, boolean b) {
+		try{
+			this.Body = data.getString("body");
+			this.type = data.getString("type");
+			this.note = Integer.parseInt(data.getString("note"));
+			switch (this.type){
+				case "multiple":
+					this.answers = new MultiCheckAnswers(data.getJSONObject("answers").getJSONArray("answers"),false);
+					break;
+				case "single":
+					try{
+						this.answers = new SingleCheckAnswers(data.getJSONObject("answers").getJSONArray("answers"),false);
+					}catch (Exception e){
+						this.answers = new SingleCheckAnswers(data.getJSONArray("answers"),false);
+						System.err.println(e.getMessage());
+					}
+					break;
+				default :
+					this.answers = null;
+			}
+		}catch (Exception e){
+			e.printStackTrace();
+		}
+	}
+
 	public Questions(String body, String type, int note, Answers answers) {
 		Body = body;
 		this.type = type;

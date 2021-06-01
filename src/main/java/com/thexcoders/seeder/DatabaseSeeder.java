@@ -126,4 +126,5 @@ public class DatabaseSeeder implements CommandLineRunner {
 
 		this.questionRepo.save(new QuestionHolder("70647bb1b46cf31e5d439e10b6759aze",new ArrayList<>(Arrays.asList(q,q1))));*/
 	}
+
 }

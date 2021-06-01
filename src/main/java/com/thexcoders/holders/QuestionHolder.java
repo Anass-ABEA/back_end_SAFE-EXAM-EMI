@@ -34,6 +34,19 @@ public class QuestionHolder {
 		}
 	}
 
+	public QuestionHolder(String id,JSONArray questions,boolean b) {
+		this.id = id;
+		this.questions = new ArrayList<>();
+		for (int i = 0; i<questions.length();i++){
+			try{
+				this.questions.add(new Questions(questions.getJSONObject(i),false));
+			}catch (Exception e){
+				e.printStackTrace();
+			}
+		}
+	}
+
+
 	public String getId() {
 		return id;
 	}

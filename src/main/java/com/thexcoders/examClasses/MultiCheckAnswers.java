@@ -27,6 +27,20 @@ public class MultiCheckAnswers extends Answers {
 		}
 	}
 
+	public MultiCheckAnswers(JSONArray answers,boolean n) {
+		super();
+		this.answers = new ArrayList<>();
+		for(int i = 0; i<answers.length();i++){
+			try {
+				JSONObject ans = answers.getJSONObject(i);
+				this.answers.add(new MultiElement(ans.getString("body"),ans.getBoolean("correct")));
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+
+		}
+	}
+
 	public ArrayList<MultiElement> getAnswers() {
 		return answers;
 	}

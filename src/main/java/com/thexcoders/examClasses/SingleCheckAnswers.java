@@ -27,6 +27,20 @@ public class SingleCheckAnswers extends Answers {
 			}
     }
 
+	public SingleCheckAnswers(JSONArray answers , boolean b) {
+		super();
+		this.answers = new ArrayList<>();
+		for(int i = 0; i<answers.length();i++){
+			try {
+				JSONObject ans = answers.getJSONObject(i);
+				this.answers.add(new MultiElement(ans.getString("body"),ans.getBoolean("correct")));
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+
+		}
+	}
+
     public ArrayList<MultiElement> getAnswers() {
 		return answers;
 	}
